@@ -1,8 +1,8 @@
-public class Node {
-    public Node[] next;
-    public int val;
+public class Node<T> {
+    public Node<T>[] next;
+    public T val;
     
-    public Node(int val, int level){
+    public Node(T val, int level){
         this.val = val;
         next = new Node[level];
         for (int i = 0; i < level; i++) {

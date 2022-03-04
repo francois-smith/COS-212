@@ -1,11 +1,31 @@
-public class List {
-    public Node head;
-    public int topLevel = 1;
-    public int numNodes;
+import java.util.Random;
 
-    public List(){
-        head = new Node(Integer.MIN_VALUE, 1);
-        numNodes = 0;
+public class List<T> {
+    private Node<T>[] head;
+    private int topLevel = 1;
+    private int numNodes;
+    private int[] powers;
+    private Random random = new Random();
+
+    public List(int topLevel){
+        this.topLevel = topLevel;
+        head = new Node[topLevel];
+        powers = new int[topLevel];
+        for (int i = 0; i < topLevel; i++) {
+            head[i] = null;
+        }
+        choosePower();
+    } 
+
+    public boolean isEmpty(){
+        return head[0] == null;
+    }
+
+    public void choosePower(){
+        powers[topLevel - 1] = (2 << (topLevel - 1));
+        for (int i = topLevel - 1, j = 0; i >= 0; i--, j++) {
+            powers[i] = powers[i+1] - (2 << j);
+        }
     }
 
     public Node search(int val){
