@@ -61,22 +61,25 @@ public class OrganisingList {
      */
     public Integer getData(Integer key) {  
         ListNode currNode = this.root;
-        ListNode firstPrev = null;
-        ListNode secondPrev = null;
-        
+        ListNode prev = null;
+
         while (currNode != null) {
             if (currNode.key.equals(key)) {
                 Integer data = currNode.data;
-
-                
+                if(prev != null){
+                    Integer tempKey = currNode.key;
+                    currNode.key = prev.key;
+                    prev.key = tempKey;
+                    
+                    Integer tempData = currNode.data;
+                    currNode.data = prev.data;
+                    prev.data = tempData;
+                }
                 calculateData();
                 return data;
             }    
             else {
-                if(firstPrev != null){
-                    secondPrev = firstPrev;
-                }
-                firstPrev = currNode;
+                prev = currNode;
                 currNode = currNode.next;
             }
         }
@@ -93,7 +96,7 @@ public class OrganisingList {
         ListNode currNode = this.root, prev = null;
  
         while (currNode != null) {
-            if (currNode.key == key) {
+            if (currNode.key.equals(key)) {
                 if(prev == null){
                     root = null;
                     calculateData();
