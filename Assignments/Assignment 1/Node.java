@@ -21,25 +21,25 @@ public class Node {
 	//Place your code below
 
 	public Node(Function function, int v1, int v2) {
-		this.nodeFunction = new Function(function);
+		this.nodeFunction = function.clone();
 		this.v1 = v1;
 		this.v2 = v2;
 	}
 
 	public Function setFunction(Function function) {
-		Function tempFunction = this.function;
-		this.function = function;
+		Function tempFunction = this.nodeFunction;
+		this.nodeFunction = function;
 		return tempFunction;
 	}
 
 	public float getValue() {
-		if(function == null)
+		if(nodeFunction == null)
 		{
 			return Float.NEGATIVE_INFINITY;
 		}
 		else
 		{
-			return function(v1, v2);
+			return nodeFunction.calculate(v1, v2);
 		}
 	}
 
@@ -51,7 +51,7 @@ public class Node {
 	}
 
 	public Function getFunction(){
-		return this.function;
+		return this.nodeFunction;
 	}
 
 	public String[] getNodeLinks(){
@@ -90,20 +90,22 @@ public class Node {
 		}
 
 		//prev
-		if(prev != null){
-			links[4] = "P["+prev.v1+"]["+prev.v2+"]{"+floatFormatter(prev.getValue())+"}";
+		if(prevVal != null){
+			links[4] = "P["+prevVal.v1+"]["+prevVal.v2+"]{"+floatFormatter(prevVal.getValue())+"}";
 		}
 		else{
 			links[4] = "P[][]{}";
 		}
 
 		//next
-		if(next != null){
-			links[5] = "N["+next.v1+"]["+next.v2+"]{"+floatFormatter(next.getValue())+"}";
+		if(nextVal != null){
+			links[5] = "N["+nextVal.v1+"]["+nextVal.v2+"]{"+floatFormatter(nextVal.getValue())+"}";
 		}
 		else{
 			links[5] = "N[][]{}";
 		}
+
+		return links;
 	}
 
 }

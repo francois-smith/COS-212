@@ -1,5 +1,7 @@
 import java.text.DecimalFormat;
 
+import javax.lang.model.util.Elements.Origin;
+
 public class Interface {
 
 	private Node origin;
@@ -13,6 +15,8 @@ public class Interface {
 	//Place your code below
 
 	public Interface() {
+		Origin initialFunction = new Origin();
+		origin = new Node(Origin, 0, 0);
 	}
 
 	public Interface(Node[] arr) {
