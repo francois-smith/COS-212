@@ -35,125 +35,123 @@ public class Interface {
 		Node newNode = new Node(function, v1, v2);
 
 		if(v1 != 0 && v2 !=0){
-			if(v1 > 0){
-				while(searchNodeV1.up != null && searchNodeV1.up.getVariables()[0] < v1){
-					searchNodeV1 = searchNodeV1.up;
+			if(v2 > 0){
+				while(searchNodeV2.up != null && searchNodeV2.up.getVariables()[0] < v2){
+					searchNodeV2 = searchNodeV2.up;
 				}
 
-				if(searchNodeV1.getVariables()[0] == v1){
+				if(searchNodeV2.getVariables()[1] == v2){
 					
 				}
-				else if (searchNodeV1.up == null && searchNodeV1.getVariables()[0] != v1){
-					V1Axis temp = new V1Axis();
-					Node newHighwayNode = new Node(temp, v1, 0);
+				else if (searchNodeV2.up == null && searchNodeV2.getVariables()[1] != v2){
+					V2Axis temp = new V2Axis();
+					Node newHighwayNode = new Node(temp, 0, v2);
 				
-					searchNodeV1.up = newHighwayNode;
-					newHighwayNode.down = searchNodeV1;
-					searchNodeV1 = newHighwayNode;
+					searchNodeV2.up = newHighwayNode;
+					newHighwayNode.down = searchNodeV2;
+					searchNodeV2 = newHighwayNode;
 				} 
-				else if (searchNodeV1.up.getVariables()[0] > v1){
-					V1Axis temp = new V1Axis();
-					Node newHighwayNode = new Node(temp, v1, 0);
+				else if (searchNodeV2.up.getVariables()[1] > v2){
+					V2Axis temp = new V2Axis();
+					Node newHighwayNode = new Node(temp, 0, v2);
 
-					newHighwayNode.up = searchNodeV1.up;
-					searchNodeV1.up.down = newHighwayNode;
-					searchNodeV1.up = newHighwayNode;
-					newHighwayNode.down = searchNodeV1;
+					newHighwayNode.up = searchNodeV2.up;
+					searchNodeV2.up.down = newHighwayNode;
+					searchNodeV2.up = newHighwayNode;
+					newHighwayNode.down = searchNodeV2;
 
-					searchNodeV1 = newHighwayNode;
+					searchNodeV2 = newHighwayNode;
 				}
 			} 
 
 
-			if(v1 < 0){
-				while(searchNodeV1.down != null && searchNodeV1.down.getVariables()[1] > v1){
-					searchNodeV1 = searchNodeV1.down;
+			if(v2 < 0){
+				while(searchNodeV2.down != null && searchNodeV2.down.getVariables()[1] > v2){
+					searchNodeV2 = searchNodeV2.down;
+				}
+
+				if(searchNodeV2.getVariables()[1] == v2){
+					
+				}
+				else if (searchNodeV2.down == null && searchNodeV2.getVariables()[1] != v2){
+					V2Axis temp = new V2Axis();
+					Node newHighwayNode = new Node(temp, 0, v2);
+				
+					searchNodeV2.down = newHighwayNode;
+					newHighwayNode.up = searchNodeV2;
+					searchNodeV2 = newHighwayNode;
+				} 
+				else if (searchNodeV2.up.getVariables()[1] > v2){
+					V2Axis temp = new V2Axis();
+					Node newHighwayNode = new Node(temp, 0, v2);
+
+					newHighwayNode.down = searchNodeV2.down;
+					searchNodeV2.down.up = newHighwayNode;
+					searchNodeV2.down = newHighwayNode;
+					newHighwayNode.up = searchNodeV2;
+
+					searchNodeV2 = newHighwayNode;
+				}
+			}
+
+			if(v1 > 0){
+				while(searchNodeV1.right != null && searchNodeV1.right.getVariables()[0] < v1){
+					searchNodeV1 = searchNodeV1.right;
 				}
 
 				if(searchNodeV1.getVariables()[0] == v1){
 					
 				}
-				else if (searchNodeV1.down == null && searchNodeV1.getVariables()[0] != v1){
+				else if (searchNodeV1.right == null && searchNodeV1.getVariables()[0] != v1){
 					V1Axis temp = new V1Axis();
 					Node newHighwayNode = new Node(temp, v1, 0);
 				
-					searchNodeV1.down = newHighwayNode;
-					newHighwayNode.up = searchNodeV1;
+					searchNodeV1.right = newHighwayNode;
+					newHighwayNode.left = searchNodeV1;
 					searchNodeV1 = newHighwayNode;
 				} 
 				else if (searchNodeV1.up.getVariables()[0] > v1){
 					V1Axis temp = new V1Axis();
 					Node newHighwayNode = new Node(temp, v1, 0);
 
-					newHighwayNode.down = searchNodeV1.down;
-					searchNodeV1.down.up = newHighwayNode;
-					searchNodeV1.down = newHighwayNode;
-					newHighwayNode.up = searchNodeV1;
+					newHighwayNode.right = searchNodeV1.right;
+					searchNodeV1.right.left = newHighwayNode;
+					searchNodeV1.right = newHighwayNode;
+					newHighwayNode.left = searchNodeV1;
+
+					searchNodeV1 = newHighwayNode;
+				}
+			}
+			else if(v1 < 0){
+				while(searchNodeV1.left != null && searchNodeV1.left.getVariables()[0] > v1){
+					searchNodeV1 = searchNodeV1.left;
+				}
+
+				if(searchNodeV1.getVariables()[0] == v1){
+					
+				}
+				else if (searchNodeV1.left == null && searchNodeV1.getVariables()[0] != v1){
+					V1Axis temp = new V1Axis();
+					Node newHighwayNode = new Node(temp, v1, 0);
+				
+					searchNodeV1.left = newHighwayNode;
+					newHighwayNode.right = searchNodeV1;
+					searchNodeV1 = newHighwayNode;
+				} 
+				else if (searchNodeV1.up.getVariables()[0] > v1){
+					V1Axis temp = new V1Axis();
+					Node newHighwayNode = new Node(temp, v1, 0);
+
+					newHighwayNode.left = searchNodeV1.left;
+					searchNodeV1.left.right = newHighwayNode;
+					searchNodeV1.left = newHighwayNode;
+					newHighwayNode.right = searchNodeV1;
 
 					searchNodeV1 = newHighwayNode;
 				}
 			}
 
-			if(v2 > 0){
-				while(searchNodeV2.right != null && searchNodeV2.right.getVariables()[1] < v2){
-					searchNodeV2 = searchNodeV2.right;
-				}
-
-				if(searchNodeV2.getVariables()[1] == v2){
-					
-				}
-				else if (searchNodeV2.right == null && searchNodeV2.getVariables()[1] != v2){
-					V2Axis temp = new V2Axis();
-					Node newHighwayNode = new Node(temp, 0, v2);
-				
-					searchNodeV2.right = newHighwayNode;
-					newHighwayNode.left = searchNodeV2;
-					searchNodeV2 = newHighwayNode;
-				} 
-				else if (searchNodeV2.up.getVariables()[1] > v1){
-					V2Axis temp = new V2Axis();
-					Node newHighwayNode = new Node(temp, 0, v2);
-
-					newHighwayNode.right = searchNodeV2.right;
-					searchNodeV2.right.left = newHighwayNode;
-					searchNodeV2.right = newHighwayNode;
-					newHighwayNode.left = searchNodeV2;
-
-					searchNodeV2 = newHighwayNode;
-				}
-			}
-			else if(v2 < 0){
-				while(searchNodeV2.left != null && searchNodeV2.left.getVariables()[1] > v2){
-					searchNodeV2 = searchNodeV2.left;
-				}
-
-				if(searchNodeV2.getVariables()[1] == v2){
-					
-				}
-				else if (searchNodeV2.left == null && searchNodeV2.getVariables()[1] != v1){
-					V2Axis temp = new V2Axis();
-					Node newHighwayNode = new Node(temp, 0, v2);
-				
-					searchNodeV2.left = newHighwayNode;
-					newHighwayNode.right = searchNodeV2;
-					searchNodeV2 = newHighwayNode;
-				} 
-				else if (searchNodeV2.up.getVariables()[1] > v1){
-					V2Axis temp = new V2Axis();
-					Node newHighwayNode = new Node(temp, 0, v2);
-
-					newHighwayNode.left = searchNodeV2.left;
-					searchNodeV2.left.right = newHighwayNode;
-					searchNodeV2.left = newHighwayNode;
-					newHighwayNode.right = searchNodeV2;
-
-					searchNodeV2 = newHighwayNode;
-				}
-			}
-
-
-
-			if(v2 >= 1){
+			if(v1 >= 1){
 				if(searchNodeV1.right == null){
 					searchNodeV1.right = newNode;
 					newNode.left = searchNodeV1;
@@ -226,7 +224,7 @@ public class Interface {
 					}
 				}
 			}
-			else if(v2 <= -1){
+			else if(v1 <= -1){
 				if(searchNodeV1.left == null){
 					searchNodeV1.left = newNode;
 					newNode.right = searchNodeV1;
@@ -300,7 +298,7 @@ public class Interface {
 				}
 			}
 
-			if(v1 >= 1){
+			if(v2 >= 1){
 				if(searchNodeV2.up == null){
 					searchNodeV2.up = newNode;
 					newNode.down = searchNodeV2;
@@ -373,7 +371,7 @@ public class Interface {
 					}
 				}
 			}
-			else if(v1 <= -1){
+			else if(v2 <= -1){
 				if(searchNodeV2.down == null){
 					searchNodeV2.down = newNode;
 					newNode.up = searchNodeV2;
@@ -455,8 +453,53 @@ public class Interface {
 	}
 
 	public Node removePoint(int v1, int v2) {
-		
-		return null;
+		if(v1 == 0|| v2 == 0){
+			return null;
+		}
+		else {
+			Node searchNodeV1 = origin, searchNodeV2 = origin;
+			Node returnNode = null;
+
+			if(v1 > 0){
+				while(searchNodeV1.up != null && searchNodeV1.up.getVariables()[0] < v1){
+					searchNodeV1 = searchNodeV1.up;
+				}
+			} 
+			else if(v1 < 0){
+				while(searchNodeV1.down != null && searchNodeV1.down.getVariables()[0] < v1){
+					searchNodeV1 = searchNodeV1.down;
+				}
+			}
+
+			if(v2 > 0){
+				while(searchNodeV2.right != null && searchNodeV2.right.getVariables()[1] < v2){
+					searchNodeV2 = searchNodeV2.right;
+				}
+			}
+			else if(v2 < 0){
+				while(searchNodeV2.left != null && searchNodeV2.left.getVariables()[1] < v2){
+					searchNodeV2 = searchNodeV2.left;
+				}
+			}
+			
+			if(searchNodeV2 != null && searchNodeV1 != null){
+				if(v1 > 0){
+					
+				} 
+				else if(v1 < 0){
+					
+				}
+	
+				if(v2 > 0){
+					
+				}
+				else if(v2 < 0){
+					
+				}
+			}
+
+			return returnNode;
+		}
 	}
 
 	public Node getPoint(int v1, int v2) {
@@ -468,12 +511,12 @@ public class Interface {
 			Node returnNode = null;
 
 			if(v1 > 0){
-				while(searchNode.up != null && searchNode.up.getVariables()[1] < v1){
+				while(searchNode.up != null && searchNode.up.getVariables()[0] < v1){
 					searchNode = searchNode.up;
 				}
 			} 
 			else if(v1 < 0){
-				while(searchNode.down != null && searchNode.down.getVariables()[1] < v1){
+				while(searchNode.down != null && searchNode.down.getVariables()[0] < v1){
 					searchNode = searchNode.down;
 				}
 			}
