@@ -3,29 +3,29 @@ import java.util.Arrays;
 public class main {
     public static void main(String[] args) {
         Interface interface1 = new Interface();
+        // for(int i=-1; i <= 1; i++)
+        // {
+        //     for(int j=1; j >= -1; j--)
+        //     {
+        //         interface1.addPoint(new ExampleFunction1(), i, j);
+        //     }
+        // }
+        // //System.out.println(interface1.printFunctionValues((new ExampleFunction1()).getFunctionName()));
+        // for(int i=-2; i <= 2; i++)
+        // {
+        //     for(int j=-2; j <= 2; j++)
+        //     {
+        //         interface1.addPoint(new ExampleFunction2(), i, j);
+        //     }
+        // }
 
         interface1.addPoint(new ExampleFunction1(), 1, 1);
-        interface1.addPoint(new ExampleFunction1(), 1, 4);
-        interface1.addPoint(new ExampleFunction1(), 1, 5);
-        interface1.addPoint(new ExampleFunction1(), 1, 2);
-        interface1.addPoint(new ExampleFunction1(), 1, 7);
-        System.out.println(interface1.getPoint(1, 7).down.getVariables()[1]);
+        interface1.addPoint(new ExampleFunction1(), 1, 1);
+        interface1.addPoint(new ExampleFunction1(), 1, 1);
+        System.out.println(interface1.numNodes);
+        System.out.println(Arrays.toString(interface1.toArray()));
 
-        /*for(int i=-1; i <= 1; i++)
-        {
-            for(int j=1; j >= -1; j--)
-            {
-                interface1.addPoint(new ExampleFunction1(), i, j);
-            }
-        }
-        System.out.println(interface1.printFunctionValues((new ExampleFunction1()).getFunctionName()));
-        for(int i=-2; i <= 2; i++)
-        {
-            for(int j=-2; j <= 2; j++)
-            {
-                interface1.addPoint(new ExampleFunction2(), i, j);
-            }
-        }
+        /*
         System.out.println(interface1.printFunctionValues((new ExampleFunction2()).getFunctionName()));
         Node n1 = interface1.getPoint(1, 1);
         for(int i=0; i < 6; i++)

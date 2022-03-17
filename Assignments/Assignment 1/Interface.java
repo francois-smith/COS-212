@@ -3,7 +3,7 @@ import java.text.DecimalFormat;
 public class Interface {
 
 	private Node origin;
-	private int numNodes = 0, counter = 0;
+	public int numNodes = 0, counter = 0;
 
 	private String floatFormatter(float value){
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -77,9 +77,9 @@ public class Interface {
 			} 
 			else if(v2 < 0){
 				if(origin.down != null){
-					while(searchNodeV2.down != null && searchNodeV2.down.getVariables()[1] > v2){
+					while(searchNodeV2.down != null && searchNodeV2.down.getVariables()[1] >= v2){
 						searchNodeV2 = searchNodeV2.down;
-					}
+					}	
 
 					if(searchNodeV2.getVariables()[1] == v2){
 						
@@ -116,14 +116,14 @@ public class Interface {
 
 			if(v1 > 0){
 				if(origin.right != null){
-					while(searchNodeV1.right != null && searchNodeV1.right.getVariables()[0] < v1){
+					while(searchNodeV1.right != null && searchNodeV1.right.getVariables()[0] <= v1){
 						searchNodeV1 = searchNodeV1.right;
-					}
+					}	
 
 					if(searchNodeV1.getVariables()[0] == v1){
 						
 					}
-					else if (searchNodeV1.right == null ){
+					else if (searchNodeV1.right == null){
 						V1Axis temp = new V1Axis();
 						Node newHighwayNode = new Node(temp, v1, 0);
 					
@@ -131,7 +131,7 @@ public class Interface {
 						newHighwayNode.left = searchNodeV1;
 						searchNodeV1 = newHighwayNode;
 					} 
-					else if (searchNodeV1.up.getVariables()[0] > v1){
+					else if (searchNodeV1.right.getVariables()[0] > v1){
 						V1Axis temp = new V1Axis();
 						Node newHighwayNode = new Node(temp, v1, 0);
 
@@ -154,9 +154,10 @@ public class Interface {
 			}
 			else if(v1 < 0){
 				if(origin.left != null){
-					while(searchNodeV1.left != null && searchNodeV1.left.getVariables()[0] > v1){
+					while(searchNodeV1.left != null && searchNodeV1.left.getVariables()[0] >= v1){
 						searchNodeV1 = searchNodeV1.left;
 					}
+
 
 					if(searchNodeV1.getVariables()[0] == v1){
 						
@@ -169,7 +170,7 @@ public class Interface {
 						newHighwayNode.right = searchNodeV1;
 						searchNodeV1 = newHighwayNode;
 					} 
-					else if (searchNodeV1.up.getVariables()[0] < v1){
+					else if (searchNodeV1.left.getVariables()[0] < v1){
 						V1Axis temp = new V1Axis();
 						Node newHighwayNode = new Node(temp, v1, 0);
 
@@ -187,7 +188,7 @@ public class Interface {
 				
 					searchNodeV1.left = newHighwayNode;
 					newHighwayNode.right = searchNodeV1;
-					searchNodeV1 = newHighwayNode;		
+					searchNodeV1 = newHighwayNode;	
 				}
 			}
 
@@ -217,7 +218,8 @@ public class Interface {
 					}
 				}
 			}
-			else if(v1 < 0){
+
+			if(v1 < 0){
 				if(searchNodeV2.left == null){
 					searchNodeV2.left = newNode;
 					newNode.right = searchNodeV2;
@@ -231,7 +233,8 @@ public class Interface {
 						searchNodeV2.left = newNode;
 						newNode.right = searchNodeV2;
 					}
-					else if(searchNodeV2.left.getVariables()[0] > newNode.getVariables()[0]){
+					else if(searchNodeV2.left.getVariables()[0] < newNode.getVariables()[0]){
+						
 						newNode.left = searchNodeV2.left;
 						searchNodeV2.left.right = newNode;
 						searchNodeV2.left = newNode;
@@ -254,15 +257,11 @@ public class Interface {
 						searchNodeV1 = searchNodeV1.up;
 					}
 
-					System.out.println(searchNodeV1.getVariables()[1]);
-				
-					 if(searchNodeV1.up == null){
-						System.out.println("dwad");
+					if(searchNodeV1.up == null){
 						searchNodeV1.up = newNode;
 						newNode.down = searchNodeV1;
 					}
 					else if(searchNodeV1.up.getVariables()[1] > newNode.getVariables()[1]){
-						System.out.println("dwad");
 						newNode.up = searchNodeV1.up;
 						searchNodeV1.up.down = newNode;
 						searchNodeV1.up = newNode;
@@ -274,7 +273,8 @@ public class Interface {
 					}
 				}
 			}
-			else if(v2 < 0){
+
+			if(v2 < 0){
 				if(searchNodeV1.down == null){
 					searchNodeV1.down = newNode;
 					newNode.up = searchNodeV1;
@@ -288,7 +288,7 @@ public class Interface {
 						searchNodeV1.down = newNode;
 						newNode.up = searchNodeV1;
 					}
-					else if(searchNodeV1.down.getVariables()[1] > newNode.getVariables()[1]){
+					else if(searchNodeV1.down.getVariables()[1] < newNode.getVariables()[1]){
 						newNode.down = searchNodeV1.down;
 						searchNodeV1.down.up = newNode;
 						searchNodeV1.down = newNode;
@@ -570,7 +570,7 @@ public class Interface {
 				}
 			}
 			else if(v1 < 0){
-				while(searchNode.left != null && searchNode.left.getVariables()[0] > v1){
+				while(searchNode.left != null && searchNode.left.getVariables()[0] >= v1){
 					searchNode = searchNode.left;
 				}
 			}
@@ -594,7 +594,7 @@ public class Interface {
 			searchNode = searchNode.right;
 		}
 
-		while(searchNode.left != null){
+		while(searchNode != null){
 			if(searchNode.getVariables()[0] == 0){
 				searchNode = searchNode.left;
 			}
@@ -611,9 +611,20 @@ public class Interface {
 						verticalSearch = verticalSearch.down;
 					}
 					else{
-						returnArray[counter] = verticalSearch;
-						counter++;
-						verticalSearch = verticalSearch.down;
+						if(verticalSearch.prevVal == null){
+							returnArray[counter] = verticalSearch;
+							counter++;
+							verticalSearch = verticalSearch.down;
+						}
+						else {
+							Node temp = verticalSearch;
+							while(temp != null)
+							{	
+								returnArray[counter] = temp;
+								counter++;
+								temp = temp.prevVal;
+							}
+						}
 					}
 					
 				}
@@ -658,7 +669,7 @@ public class Interface {
 	}
 
 	public int countNumberOfPoints(){
-		return 0;
+		return numNodes;
 	}
 
 	public int[] numPointsPerQuadrant(){
@@ -716,11 +727,10 @@ public class Interface {
 					temp.prevVal = newNode;
 					newNode.nextVal = temp;
 				}
-				else {	
-					newNode.nextVal = temp.nextVal;
-					temp.nextVal.prevVal = newNode;
-					temp.nextVal = newNode;
-					newNode.prevVal = temp;
+				else {
+					newNode.prevVal = temp.prevVal;
+					temp.prevVal = newNode;
+					newNode.prevVal.nextVal = newNode;
 				}	
 			}
 		}
@@ -773,5 +783,4 @@ public class Interface {
 			node.down = null;
 		}
 	}
-
 }
