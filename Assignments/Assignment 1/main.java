@@ -5,13 +5,11 @@ public class main {
         Interface interface1 = new Interface();
 
         interface1.addPoint(new ExampleFunction1(), 1, 1);
-        interface1.addPoint(new ExampleFunction1(), 6, 3);
-        interface1.addPoint(new ExampleFunction1(), -2, -9);
-        interface1.addPoint(new ExampleFunction1(), 3, -3);
-        System.out.println(Arrays.toString(interface1.getPoint(6, 3).getVariables()));
-        System.out.println(Arrays.toString(interface1.getPoint(1, 1).getVariables()));
-        System.out.println(Arrays.toString(interface1.getPoint(-2, -9).getVariables()));
-        System.out.println(Arrays.toString(interface1.getPoint(3, -5).getVariables()));
+        interface1.addPoint(new ExampleFunction1(), 1, 4);
+        interface1.addPoint(new ExampleFunction1(), 1, 5);
+        interface1.addPoint(new ExampleFunction1(), 1, 2);
+        interface1.addPoint(new ExampleFunction1(), 1, 7);
+        System.out.println(interface1.getPoint(1, 7).down.getVariables()[1]);
 
         /*for(int i=-1; i <= 1; i++)
         {
