@@ -22,6 +22,7 @@ public class BST<T extends Comparable<T>> {
     }
 
     public Object[] toArray(){
+        if(root == null) return null;
         Object BSTArray[] = new Object[numNodes()];
         BSTNode<T> searchNode = root;
         int index = 0;
@@ -81,7 +82,7 @@ public class BST<T extends Comparable<T>> {
             return -1;
         else {
             BSTNode<T> searchNode = root;
-            return height(searchNode);
+            return height(searchNode)-1;
         }
     }
 
@@ -93,6 +94,7 @@ public class BST<T extends Comparable<T>> {
 
         //get amount of nodes on height
         BSTNode<T> searchNode = root;
+        numNodesOnHeight = 0;
         getNumNodesAtHeight(searchNode, 0, h);
 
         //create array and go get value on height
@@ -105,6 +107,7 @@ public class BST<T extends Comparable<T>> {
     }
 
     public String DFT(){
+        if(root == null) return "";
         BSTNode<T> searchNode = root;
         DFT(searchNode);
         String out = DFTOut.substring(0, DFTOut.length() - 1);
@@ -112,8 +115,9 @@ public class BST<T extends Comparable<T>> {
     }
     
     public String BFT(){
+        if(root == null) return "";
         String out = "";
-        for (int i = 0; i < this.height(); i++) {
+        for (int i = 0; i < height()+1; i++) {
             BSTNode<T> searchNode = root;
             getNumNodesAtHeight(searchNode, 0, i);
             Object[] returnArray = new Object[numNodesOnHeight];
@@ -130,11 +134,13 @@ public class BST<T extends Comparable<T>> {
     }
     
     public T maxVal(){
+        if(root == null) return null;
         BSTNode<T> searchNode = root;
         return maxVal(searchNode);
     }
 
     public T minVal(){
+        if(root == null) return null;
         BSTNode<T> searchNode = root;
         return minVal(searchNode);
     }
