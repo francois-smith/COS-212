@@ -1,7 +1,19 @@
+import java.util.Arrays;
+
 public class main {
     public static void main(String[] args) {
         Interface interface1 = new Interface();
-        for(int i=-1; i <= 1; i++)
+
+        interface1.addPoint(new ExampleFunction1(), 1, 1);
+        interface1.addPoint(new ExampleFunction1(), 6, 3);
+        interface1.addPoint(new ExampleFunction1(), -2, -9);
+        interface1.addPoint(new ExampleFunction1(), 3, -3);
+        System.out.println(Arrays.toString(interface1.getPoint(6, 3).getVariables()));
+        System.out.println(Arrays.toString(interface1.getPoint(1, 1).getVariables()));
+        System.out.println(Arrays.toString(interface1.getPoint(-2, -9).getVariables()));
+        System.out.println(Arrays.toString(interface1.getPoint(3, -5).getVariables()));
+
+        /*for(int i=-1; i <= 1; i++)
         {
             for(int j=1; j >= -1; j--)
             {
@@ -48,7 +60,7 @@ public class main {
         else 
             System.out.println("Problem");
         System.out.println(n4.getFunction().getFunctionName());
-        System.out.println(n4.getValue() + " == " + interface1.calculateValue((new ExampleFunction2()), 1, 1));
+        System.out.println(n4.getValue() + " == " + interface1.calculateValue((new ExampleFunction2()), 1, 1));*/
     }
 }
 
