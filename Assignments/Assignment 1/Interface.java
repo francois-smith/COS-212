@@ -34,6 +34,7 @@ public class Interface {
 	public float addPoint(Function function, int v1, int v2) {
 		Node searchNodeV1 = origin, searchNodeV2 = origin;
 		Node newNode = new Node(function, v1, v2);
+		boolean alreadyInserted = false;
 
 		if(v1 != 0 && v2 !=0){
 			if(v2 > 0){
@@ -92,7 +93,7 @@ public class Interface {
 						newHighwayNode.up = searchNodeV2;
 						searchNodeV2 = newHighwayNode;
 					} 
-					else if (searchNodeV2.up.getVariables()[1] < v2){
+					else if (searchNodeV2.down.getVariables()[1] < v2){
 						V2Axis temp = new V2Axis();
 						Node newHighwayNode = new Node(temp, 0, v2);
 
@@ -192,6 +193,7 @@ public class Interface {
 				}
 			}
 
+//==============================================================Linking new node===============================================================
 			if(v1 > 0){
 				if(searchNodeV2.right == null){
 					searchNodeV2.right = newNode;
@@ -215,6 +217,7 @@ public class Interface {
 					else if(searchNodeV2.right.getVariables()[0] == newNode.getVariables()[0] && searchNodeV2.right.getVariables()[1] == newNode.getVariables()[1]){
 						searchNodeV2 = searchNodeV2.right;
 						insertIntoExistingPoint(newNode, searchNodeV2);
+						alreadyInserted = true;
 					}
 				}
 			}
@@ -243,6 +246,7 @@ public class Interface {
 					else if(searchNodeV2.left.getVariables()[0] == newNode.getVariables()[0] && searchNodeV2.left.getVariables()[1] == newNode.getVariables()[1]){
 						searchNodeV2 = searchNodeV2.left;
 						insertIntoExistingPoint(newNode, searchNodeV2);
+						alreadyInserted = true;
 					}
 				}
 			}
@@ -268,8 +272,10 @@ public class Interface {
 						newNode.down = searchNodeV1;
 					}
 					else if(searchNodeV1.up.getVariables()[0] == newNode.getVariables()[0] && searchNodeV1.up.getVariables()[1] == newNode.getVariables()[1]){
-						searchNodeV1 = searchNodeV1.up;
-						insertIntoExistingPoint(newNode, searchNodeV1);
+						if(!alreadyInserted){
+							searchNodeV1 = searchNodeV1.up;
+							insertIntoExistingPoint(newNode, searchNodeV1);
+						}	
 					}
 				}
 			}
@@ -295,8 +301,10 @@ public class Interface {
 						newNode.up = searchNodeV1;
 					}
 					else if(searchNodeV1.down.getVariables()[0] == newNode.getVariables()[0] && searchNodeV1.down.getVariables()[1] == newNode.getVariables()[1]){
-						searchNodeV1 = searchNodeV1.down;
-						insertIntoExistingPoint(newNode, searchNodeV1);
+						if(!alreadyInserted){
+							searchNodeV1 = searchNodeV1.down;
+							insertIntoExistingPoint(newNode, searchNodeV1);
+						}
 					}
 				}
 			}
@@ -605,8 +613,7 @@ public class Interface {
 					verticalSearch = verticalSearch.up;
 				}
 
-				while(verticalSearch.down != null){
-				
+				while(verticalSearch != null){	
 					if(verticalSearch.getVariables()[1] == 0){
 						verticalSearch = verticalSearch.down;
 					}
@@ -624,6 +631,7 @@ public class Interface {
 								counter++;
 								temp = temp.prevVal;
 							}
+							verticalSearch = verticalSearch.down;
 						}
 					}
 					
@@ -645,19 +653,190 @@ public class Interface {
 	}
 
 	public float findMaxValue() {
-		return Float.NaN;
+		if(numNodes == 0)
+		{
+			return Float.NaN;
+		}
+		else{
+			float maxValue = -999999999;
+			for (Node node : toArray()) {
+				if(node.getValue() > maxValue){
+					maxValue = node.getValue();
+				}
+			}
+			return maxValue;
+		}
 	}
 
 	public Node findMax() {
-		return null;
+		if(numNodes == 0)
+		{
+			return null;
+		}
+		else{
+			Node returnNode = null;
+
+			float high = toArray()[0].getValue();
+			for (Node node : toArray()){
+				if (node.getValue() > high){
+					high = node.getValue();
+				}
+			}
+				
+			Node[] highestValArray = new Node[numNodes];
+			int i = 0;
+			for (Node node : toArray()){
+				if(node.getValue() == high){
+					highestValArray[i] = node;
+					i++;
+				}
+			}	
+
+			int minV1 = 99999999;
+			for (Node node : highestValArray){
+				if(node != null){
+					if(node.getVariables()[0] < minV1){
+						minV1 = node.getVariables()[0];
+					}
+				}
+			}
+
+			Node[] minV1Array = new Node[i];
+			i = 0;
+			for (Node node : highestValArray) {
+				if(node != null){
+					if(node.getVariables()[0] == minV1){
+						minV1Array[i] = node;
+						i++;
+					}
+				}
+			}
+
+			int maxV2 = -999999999;
+			for (Node node : minV1Array) {
+				if(node != null){
+					if(node.getVariables()[1] > maxV2){
+						maxV2 = node.getVariables()[1];
+					}
+				}
+			}
+
+			Node[] maxV2Array = new Node[i];
+			i = 0;
+			for (Node node : minV1Array) {
+				if(node != null){
+					if(node.getVariables()[1] == maxV2){
+						maxV2Array[i] = node;
+						i++;
+					}
+				}
+			}
+
+			returnNode = maxV2Array[0];
+			for (Node node : maxV2Array) {
+				if(node != null){
+					if(node.getFunction().getFunctionName().compareTo(returnNode.getFunction().getFunctionName()) < 0){
+						returnNode = node;
+					}
+				}
+			}
+
+			return returnNode;
+		}
 	}
 
 	public float findMinValue() {
-		return Float.NaN;
+		if(numNodes == 0)
+		{
+			return Float.NaN;
+		}
+		else{
+			float minValue = 999999999;
+			for (Node node : toArray()) {
+				if(node.getValue() > minValue){
+					minValue = node.getValue();
+				}
+			}
+			return minValue;
+		}
 	}
 
 	public Node findMin() {
-		return null;
+		if(numNodes == 0)
+		{
+			return null;
+		}
+		else{
+			Node returnNode = null;
+
+			float min = toArray()[0].getValue();
+			for (Node node : toArray()){
+				if (node.getValue() < min){
+					min = node.getValue();	
+				}
+			}
+				
+			Node[] minValArray = new Node[numNodes];
+			int i = 0;
+			for (Node node : toArray()){
+				if(node.getValue() == min){
+					minValArray[i] = node;
+					i++;
+				}
+			}	
+
+			int minV1 = 999999999;
+			for (Node node : minValArray){
+				if(node != null){
+					if(node.getVariables()[0] < minV1){
+						minV1 = node.getVariables()[0];
+					}
+				}
+			}
+
+			Node[] minV1Array = new Node[i];
+			i = 0;
+			for (Node node : minValArray) {
+				if(node != null){
+					if(node.getVariables()[0] == minV1){
+						minV1Array[i] = node;
+						i++;
+					}
+				}
+			}
+
+			int maxV2 = -99999999;
+			for (Node node : minV1Array) {
+				if(node != null){
+					if(node.getVariables()[1] > maxV2){
+						maxV2 = node.getVariables()[1];
+					}
+				}
+			}
+
+
+			Node[] maxV2Array = new Node[i];
+			i = 0;
+			for (Node node : minV1Array) {
+				if(node != null){
+					if(node.getVariables()[1] == maxV2){
+						maxV2Array[i] = node;
+						i++;
+					}
+				}
+			}
+
+			returnNode = maxV2Array[0];
+			for (Node node : maxV2Array) {
+				if(node != null){
+					if(node.getFunction().getFunctionName().compareTo(returnNode.getFunction().getFunctionName()) < 0){
+						returnNode = node;
+					}
+				}
+			}
+
+			return returnNode;
+		}
 	}
 
 	public String printFunctionValues(String functionName) {
@@ -725,7 +904,6 @@ public class Interface {
 
 				if(temp.prevVal == null){
 					temp.prevVal = newNode;
-					newNode.nextVal = temp;
 				}
 				else {
 					newNode.prevVal = temp.prevVal;
