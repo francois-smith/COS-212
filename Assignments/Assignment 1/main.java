@@ -10,7 +10,8 @@ public class main {
                 interface1.addPoint(new ExampleFunction1(), i, j);
             }
         }
-        //System.out.println(interface1.printFunctionValues((new ExampleFunction1()).getFunctionName()));
+        System.out.println(interface1.printFunctionValues((new ExampleFunction1()).getFunctionName()));
+
         for(int i=-2; i <= 2; i++)
         {
             for(int j=-2; j <= 2; j++)
@@ -19,13 +20,6 @@ public class main {
             }
         }
 
-        // interface1.addPoint(new ExampleFunction1(), -1, -1);
-        // interface1.addPoint(new ExampleFunction1(), -2, -5);
-        // interface1.addPoint(new ExampleFunction1(), -2, -3);
-        // interface1.addPoint(new ExampleFunction1(), -5, -7);
-        System.out.println(interface1.findMin().getValue());
-
-        /*
         System.out.println(interface1.printFunctionValues((new ExampleFunction2()).getFunctionName()));
         Node n1 = interface1.getPoint(1, 1);
         for(int i=0; i < 6; i++)
@@ -56,9 +50,9 @@ public class main {
         if(n4 != n1)
             System.out.println("Correct");
         else 
-            System.out.println("Problem");
+            System.out.println("Problem");    
         System.out.println(n4.getFunction().getFunctionName());
-        System.out.println(n4.getValue() + " == " + interface1.calculateValue((new ExampleFunction2()), 1, 1));*/
+        System.out.println(n4.getValue() + " == " + interface1.calculateValue((new ExampleFunction2()), 1, 1));
     }
 }
 

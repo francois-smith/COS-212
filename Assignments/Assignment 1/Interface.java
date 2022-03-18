@@ -594,6 +594,9 @@ public class Interface {
 	}
 
 	public Node[] toArray() {
+		if(numNodes == 0){
+			return null;
+		}
 		Node[] returnArray =  new Node[numNodes];
 		Node searchNode = origin;
 		counter = 0;
@@ -840,11 +843,100 @@ public class Interface {
 	}
 
 	public String printFunctionValues(String functionName) {
-		return "";
+		String returnString = "";
+		Node searchNode = origin;
+
+		while(searchNode.left != null){
+			searchNode = searchNode.left;
+		}
+
+		while(searchNode != null){
+			if(searchNode.getVariables()[0] == 0){
+				searchNode = searchNode.right;
+			}
+			else{
+				Node verticalSearch = searchNode;
+				while(verticalSearch.down != null){
+					verticalSearch = verticalSearch.down;
+				}
+
+				while(verticalSearch != null){	
+					if(verticalSearch.getVariables()[1] == 0){
+						verticalSearch = verticalSearch.up;
+					}
+					else{
+						if(verticalSearch.prevVal == null){
+							if(verticalSearch.getFunction().getFunctionName().equals(functionName)){
+								returnString += floatFormatter(verticalSearch.getValue()) + ";";
+							}
+							verticalSearch = verticalSearch.up;
+						}
+						else {
+							Node temp = verticalSearch;
+							while(temp != null)
+							{	
+								if(temp.getFunction().getFunctionName().equals(functionName)){
+									returnString += floatFormatter(temp.getValue()) + ";";
+								}
+								temp = temp.prevVal;
+							}
+							verticalSearch = verticalSearch.up;
+						}
+					}
+				}
+				searchNode = searchNode.right;
+			}
+		}
+
+		returnString = returnString.substring(0, returnString.length() - 1);
+
+		return returnString;
 	}
 
 	public int removeAllFunctionPoints(String functionName){
-		return 0;
+		int numRemoved = 0;
+		Node searchNode = origin;
+		Node[] deleteList = new Node[numNodes];
+
+		while(searchNode.left != null){
+			searchNode = searchNode.left;
+		}
+
+		while(searchNode != null){
+			if(searchNode.getVariables()[0] == 0){
+				searchNode = searchNode.right;
+			}
+			else{
+				Node verticalSearch = searchNode;
+				
+				while(verticalSearch.down != null){
+					verticalSearch = verticalSearch.down;
+				}
+
+				while(verticalSearch != null){	
+					if(verticalSearch.getVariables()[1] == 0){
+						verticalSearch = verticalSearch.up;
+					}
+					else{
+						if(verticalSearch.getFunction().getFunctionName().equals(functionName)){
+							deleteList[numRemoved] = verticalSearch;
+							numRemoved++;
+						}
+						verticalSearch = verticalSearch.up;
+					}
+					
+				}
+				searchNode = searchNode.right;
+			}
+		}
+
+		for (Node node : deleteList) {
+			if (node != null){
+				removePoint(node.getVariables()[0], node.getVariables()[1]);
+			}
+		}
+
+		return numRemoved;
 	}
 
 	public int countNumberOfPoints(){
@@ -852,7 +944,100 @@ public class Interface {
 	}
 
 	public int[] numPointsPerQuadrant(){
-		return null;
+		int topLeft = 0, bottomLeft = 0, topRight = 0, bottomRight = 0;
+
+		Node v1Axis = origin;
+
+		while(v1Axis.left != null){
+			v1Axis = v1Axis.left;
+		}
+
+		while(v1Axis != null){
+			if(v1Axis.getVariables()[0] == 0){
+				v1Axis = v1Axis.right;
+			}
+			else{
+				Node v2Axis = v1Axis;
+				while(v2Axis.up != null){
+					v2Axis = v2Axis.up;
+				}
+
+				while(v2Axis != null){	
+					if(v2Axis.getVariables()[1] == 0){
+						v2Axis = v2Axis.down;
+					}
+					else if(v2Axis.getVariables()[1] > 0 && v2Axis.getVariables()[0] < 0){
+						
+						if(v2Axis.prevVal == null){
+							topLeft++;
+						}
+						else {
+							Node temp = v2Axis;
+							while(temp != null)
+							{	
+								topLeft++;
+								temp = temp.prevVal;
+							}
+						}
+						v2Axis = v2Axis.down;
+					}
+					else if(v2Axis.getVariables()[1] < 0 && v2Axis.getVariables()[0] < 0){
+						if(v2Axis.prevVal == null){
+							bottomLeft++;
+						}
+						else {
+							Node temp = v2Axis;
+							while(temp != null)
+							{	
+								bottomLeft++;
+								temp = temp.prevVal;
+							}
+						}
+						v2Axis = v2Axis.down;
+					}
+					else if(v2Axis.getVariables()[1] > 0 && v2Axis.getVariables()[0] > 0){
+						if(v2Axis.prevVal == null){
+							topRight++;
+						}
+						else {
+							Node temp = v2Axis;
+							while(temp != null)
+							{	
+								topRight++;
+								temp = temp.prevVal;
+							}
+						}
+						v2Axis = v2Axis.down;
+					}
+					else if(v2Axis.getVariables()[1] < 0 && v2Axis.getVariables()[0] > 0){
+						if(v2Axis.prevVal == null){
+							bottomRight++;
+						}
+						else {
+							Node temp = v2Axis;
+							while(temp != null)
+							{	
+								bottomRight++;
+								temp = temp.prevVal;
+							}
+						}
+						v2Axis = v2Axis.down;
+					}
+					else {
+						v2Axis = v2Axis.down;
+					}
+				}
+			}
+
+			v1Axis = v1Axis.right;
+		}
+
+		int[] returnArray = new int[4];
+		returnArray[0] = topLeft;
+		returnArray[1] = bottomLeft;
+		returnArray[2] = topRight;
+		returnArray[3] = bottomRight;
+		return returnArray;
 	}
 
 	public void clearAllData(){
