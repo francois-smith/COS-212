@@ -19,6 +19,8 @@ public class Interface {
 	}
 
 	public Interface(Node[] arr) {
+		Origin temp = new Origin();
+		this.origin = new Node(temp, 0, 0);
 		for (Node node : arr) {
 			if(node != null){
 				int v1 = node.getVariables()[0], v2 = node.getVariables()[1];
@@ -888,8 +890,10 @@ public class Interface {
 			}
 		}
 
-		returnString = returnString.substring(0, returnString.length() - 1);
-
+		if(returnString != ""){
+			returnString = returnString.substring(0, returnString.length() - 1);
+		}
+		
 		return returnString;
 	}
 
@@ -954,7 +958,7 @@ public class Interface {
 
 		while(v1Axis != null){
 			if(v1Axis.getVariables()[0] == 0){
-				v1Axis = v1Axis.right;
+				v1Axis = v1Axis.right;		
 			}
 			else{
 				Node v2Axis = v1Axis;
@@ -1027,9 +1031,8 @@ public class Interface {
 						v2Axis = v2Axis.down;
 					}
 				}
-			}
-
-			v1Axis = v1Axis.right;
+				v1Axis = v1Axis.right;
+			}		
 		}
 
 		int[] returnArray = new int[4];
