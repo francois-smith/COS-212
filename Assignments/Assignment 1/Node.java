@@ -21,7 +21,9 @@ public class Node {
 	//Place your code below
 
 	public Node(Function function, int v1, int v2) {
-		this.nodeFunction = function.clone();
+		if(function != null) {
+			this.nodeFunction = function.clone();
+		}	
 		this.v1 = v1;
 		this.v2 = v2;
 	}

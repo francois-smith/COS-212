@@ -320,7 +320,7 @@ public class Interface {
 	}
 
 	public Node removePoint(int v1, int v2) {
-		if(v1 == 0|| v2 == 0){
+		if(v1 == 0 || v2 == 0){
 			return null;
 		}
 		else {
@@ -352,47 +352,9 @@ public class Interface {
 				Node deleteNode = null;
 
 				if(v1 > 0){
-					if(searchNodeV2.right.getVariables()[0] == v1){
-						deleteNode = searchNodeV2.right;
-						if(deleteNode.prevVal != null){
-							swapPrevNode(deleteNode, deleteNode.prevVal);
-						}
-						else{
-							if(deleteNode.right != null){
-								deleteNode.left.right = deleteNode.right;
-								deleteNode.right.left = deleteNode.left;
-							} 
-							else {
-								clearNodeHorizontal(deleteNode);
-							}
-
-							if(v2 > 0){
-								if(deleteNode.up != null){
-									deleteNode.up.down = deleteNode.down;
-									deleteNode.down.up = deleteNode.up;
-								} 
-								else {
-									clearNodeVertical(deleteNode);
-								}
-							}
-							else if(v2 < 0){
-								if(deleteNode.down != null){
-									deleteNode.down.up = deleteNode.up;
-									deleteNode.up.down = deleteNode.down;
-								} 
-								else {
-									clearNodeVertical(deleteNode);
-								}
-							}
-						}
-					}
-					else if(searchNodeV2.right.getVariables()[0] < v1){
-						Node temp = searchNodeV2;
-						while(temp.right != null && temp.right.getVariables()[0] < v1){
-							temp = temp.right;
-						}
-	
-						if(temp.right.getVariables()[0] == v1){
+					if(searchNodeV2.getVariables()[1] == v2 && searchNodeV2.right != null){
+						deleteNode = null;
+						if(searchNodeV2.right.getVariables()[0] == v1 && searchNodeV2.right.getVariables()[1] == v2){
 							deleteNode = searchNodeV2.right;
 							if(deleteNode.prevVal != null){
 								swapPrevNode(deleteNode, deleteNode.prevVal);
@@ -401,15 +363,19 @@ public class Interface {
 								if(deleteNode.right != null){
 									deleteNode.left.right = deleteNode.right;
 									deleteNode.right.left = deleteNode.left;
+									deleteNode.left = null;
+									deleteNode.right = null;
 								} 
 								else {
 									clearNodeHorizontal(deleteNode);
 								}
-
+	
 								if(v2 > 0){
 									if(deleteNode.up != null){
 										deleteNode.up.down = deleteNode.down;
 										deleteNode.down.up = deleteNode.up;
+										deleteNode.up = null;
+										deleteNode.down = null;
 									} 
 									else {
 										clearNodeVertical(deleteNode);
@@ -419,6 +385,8 @@ public class Interface {
 									if(deleteNode.down != null){
 										deleteNode.down.up = deleteNode.up;
 										deleteNode.up.down = deleteNode.down;
+										deleteNode.down = null;
+										deleteNode.up = null;
 									} 
 									else {
 										clearNodeVertical(deleteNode);
@@ -426,44 +394,61 @@ public class Interface {
 								}
 							}
 						}
+						else if(searchNodeV2.right.getVariables()[0] < v1){
+							Node temp = searchNodeV2;
+							while(temp.right != null && temp.right.getVariables()[0] < v1){
+								temp = temp.right;
+							}
+		
+							if(temp.right != null){
+								if(temp.right.getVariables()[0] == v1){
+									deleteNode = temp.right;
+									if(deleteNode.prevVal != null){
+										swapPrevNode(deleteNode, deleteNode.prevVal);
+									}
+									else{
+										if(deleteNode.right != null){
+											deleteNode.left.right = deleteNode.right;
+											deleteNode.right.left = deleteNode.left;
+											deleteNode.left = null;
+											deleteNode.right = null;
+										} 
+										else {
+											clearNodeHorizontal(deleteNode);
+										}
+			
+										if(v2 > 0){
+											if(deleteNode.up != null){
+												deleteNode.up.down = deleteNode.down;
+												deleteNode.down.up = deleteNode.up;
+												deleteNode.up = null;
+												deleteNode.down = null;
+											} 
+											else {
+												clearNodeVertical(deleteNode);
+											}
+										}
+										else if(v2 < 0){
+											if(deleteNode.down != null){
+												deleteNode.down.up = deleteNode.up;
+												deleteNode.up.down = deleteNode.down;
+												deleteNode.down = null;
+												deleteNode.up = null;
+											} 
+											else {
+												clearNodeVertical(deleteNode);
+											}
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 				else if(v1 < 0){
-					if(searchNodeV2.left.getVariables()[0] == v1){
-						deleteNode = searchNodeV2.left;
-						if(deleteNode.prevVal != null){
-							swapPrevNode(deleteNode, deleteNode.prevVal);
-						}
-						else{
-							if(deleteNode.left != null){
-								deleteNode.left.right = deleteNode.right;
-								deleteNode.right.left = deleteNode.left;
-							}
-							else {
-								clearNodeHorizontal(deleteNode);
-							}
-
-							if(v2 > 0){
-								if(deleteNode.up != null){
-									deleteNode.up.down = deleteNode.down;
-									deleteNode.down.up = deleteNode.up;
-								} 
-							}
-							else if(v2 < 0){
-								if(deleteNode.down != null){
-									deleteNode.down.up = deleteNode.up;
-									deleteNode.up.down = deleteNode.down;
-								} 
-							}
-						}
-					}
-					else if(searchNodeV2.left.getVariables()[0] > v1){
-						Node temp = searchNodeV2;
-						while(temp.left != null && temp.left.getVariables()[0] > v1){
-							temp = temp.left;
-						}
-	
-						if(temp.left.getVariables()[0] == v1){
+					if(searchNodeV2.getVariables()[1] == v2 && searchNodeV2.left != null){
+						deleteNode = null;
+						if(searchNodeV2.left.getVariables()[0] == v1 && searchNodeV2.left.getVariables()[1] == v2){
 							deleteNode = searchNodeV2.left;
 							if(deleteNode.prevVal != null){
 								swapPrevNode(deleteNode, deleteNode.prevVal);
@@ -472,82 +457,148 @@ public class Interface {
 								if(deleteNode.left != null){
 									deleteNode.right.left = deleteNode.left;
 									deleteNode.left.right = deleteNode.right;
+									deleteNode.left = null;
+									deleteNode.right = null;
 								} 
 								else {
 									clearNodeHorizontal(deleteNode);
 								}
+	
 								if(v2 > 0){
 									if(deleteNode.up != null){
 										deleteNode.up.down = deleteNode.down;
 										deleteNode.down.up = deleteNode.up;
+										deleteNode.up = null;
+										deleteNode.down = null;
 									} 
+									else {
+										clearNodeVertical(deleteNode);
+									}
 								}
 								else if(v2 < 0){
 									if(deleteNode.down != null){
 										deleteNode.down.up = deleteNode.up;
 										deleteNode.up.down = deleteNode.down;
+										deleteNode.down = null;
+										deleteNode.up = null;
 									} 
+									else {
+										clearNodeVertical(deleteNode);
+									}
+								}
+							}
+						}
+						else if(searchNodeV2.left.getVariables()[0] > v1){
+							Node temp = searchNodeV2;
+							while(temp.left != null && temp.left.getVariables()[0] > v1){
+								temp = temp.left;
+							}
+		
+							if(temp.left != null){
+								if(temp.left.getVariables()[0] == v1){
+									deleteNode = temp.left;
+									if(deleteNode.prevVal != null){
+										swapPrevNode(deleteNode, deleteNode.prevVal);
+									}
+									else{
+										if(deleteNode.left != null){
+											deleteNode.left.right = deleteNode.right;
+											deleteNode.right.left = deleteNode.left;
+											deleteNode.left = null;
+											deleteNode.right = null;
+										} 
+										else {
+											clearNodeHorizontal(deleteNode);
+										}
+			
+										if(v2 > 0){
+											if(deleteNode.up != null){
+												deleteNode.up.down = deleteNode.down;
+												deleteNode.down.up = deleteNode.up;
+												deleteNode.up = null;
+												deleteNode.down = null;
+											} 
+											else {
+												clearNodeVertical(deleteNode);
+											}
+										}
+										else if(v2 < 0){
+											if(deleteNode.down != null){
+												deleteNode.down.up = deleteNode.up;
+												deleteNode.up.down = deleteNode.down;
+												deleteNode.down = null;
+												deleteNode.up = null;
+											} 
+											else {
+												clearNodeVertical(deleteNode);
+											}
+										}
+									}
 								}
 							}
 						}
 					}
 				}	
 
-				if(searchNodeV1.left == null && searchNodeV1.right == null){
+
+				if(searchNodeV2.left == null && searchNodeV2.right == null){
 					if(v2 > 0){
-						if(searchNodeV1.up == null){
-							searchNodeV1.down.up = null;
-							searchNodeV1.down = null;
-							searchNodeV1 = null;
+						if(searchNodeV2.up == null){
+							searchNodeV2.down.up = null;
+							searchNodeV2.down = null;
+							searchNodeV2 = null;
 						}
 						else {
-							searchNodeV1.down.up = searchNodeV1.up;
-							searchNodeV1.up.down = searchNodeV1.down;
-							searchNodeV1 = null;
+							searchNodeV2.down.up = searchNodeV2.up;
+							searchNodeV2.up.down = searchNodeV2.down;
+							searchNodeV2 = null;
 						}
 					}
 					else if(v2 < 0){
-						if(searchNodeV1.down == null){
-							searchNodeV1.up.down = null;
-							searchNodeV1.up = null;
+						if(searchNodeV2.down == null){
+							searchNodeV2.up.down = null;
+							searchNodeV2.up = null;
+							searchNodeV2 = null;
+						}
+						else {
+							searchNodeV2.up.down = searchNodeV2.down;
+							searchNodeV2.down.up = searchNodeV2.up;
+							searchNodeV2 = null;
+						}
+					}
+				}
+
+				if(searchNodeV1.up == null && searchNodeV1.down == null){
+					if(v1 > 0){
+						if(searchNodeV1.right == null){
+							searchNodeV1.left.right = null;
+							searchNodeV1.left = null;
 							searchNodeV1 = null;
 						}
 						else {
-							searchNodeV1.up.down = searchNodeV1.down;
-							searchNodeV1.down.up = searchNodeV1.up;
+							searchNodeV1.right.left = searchNodeV1.left;
+							searchNodeV1.left.right = searchNodeV1.right;
+							searchNodeV1 = null;
+						}
+					}
+					else if(v1 < 0){
+						if(searchNodeV1.left == null){
+							searchNodeV1.right.left = null;
+							searchNodeV1.right = null;
+							searchNodeV1 = null;
+						}
+						else {
+							searchNodeV1.left.right = searchNodeV1.right;
+							searchNodeV1.right.left = searchNodeV1.left;
 							searchNodeV1 = null;
 						}
 					}
 				}
 
-				if(searchNodeV2.up == null && searchNodeV2.down == null){
-					if(v1 > 0){
-						if(searchNodeV2.right == null){
-							searchNodeV2.left.right = null;
-							searchNodeV2.left = null;
-							searchNodeV2 = null;
-						}
-						else {
-							searchNodeV2.right.left = searchNodeV2.left;
-							searchNodeV2.left.right = searchNodeV2.right;
-							searchNodeV2 = null;
-						}
-					}
-					else if(v1 < 0){
-						if(searchNodeV2.left == null){
-							searchNodeV2.right.left = null;
-							searchNodeV2.right = null;
-							searchNodeV2 = null;
-						}
-						else {
-							searchNodeV2.left.right = searchNodeV2.right;
-							searchNodeV2.right.left = searchNodeV2.left;
-							searchNodeV2 = null;
-						}
-					}
+				if(deleteNode != null){
+					numNodes--;
 				}
-				
-				numNodes--;
+
 				return deleteNode;
 			}
 
@@ -758,7 +809,7 @@ public class Interface {
 		else{
 			float minValue = 999999999;
 			for (Node node : toArray()) {
-				if(node.getValue() > minValue){
+				if(node.getValue() < minValue){
 					minValue = node.getValue();
 				}
 			}
@@ -868,7 +919,7 @@ public class Interface {
 					}
 					else{
 						if(verticalSearch.prevVal == null){
-							if(verticalSearch.getFunction().getFunctionName().equals(functionName)){
+							if(verticalSearch.getFunction().getFunctionName() == functionName){
 								returnString += floatFormatter(verticalSearch.getValue()) + ";";
 							}
 							verticalSearch = verticalSearch.up;
@@ -877,7 +928,7 @@ public class Interface {
 							Node temp = verticalSearch;
 							while(temp != null)
 							{	
-								if(temp.getFunction().getFunctionName().equals(functionName)){
+								if(temp.getFunction().getFunctionName() == functionName){
 									returnString += floatFormatter(temp.getValue()) + ";";
 								}
 								temp = temp.prevVal;
@@ -922,9 +973,22 @@ public class Interface {
 						verticalSearch = verticalSearch.up;
 					}
 					else{
-						if(verticalSearch.getFunction().getFunctionName().equals(functionName)){
-							deleteList[numRemoved] = verticalSearch;
-							numRemoved++;
+						if(verticalSearch.prevVal == null){
+							if(verticalSearch.getFunction().getFunctionName().equals(functionName)){
+								deleteList[numRemoved] = verticalSearch;
+								numRemoved++;
+							}
+						}
+						else {
+							Node temp = verticalSearch;
+							while(temp != null)
+							{	
+								if(temp.getFunction().getFunctionName().equals(functionName)){
+									deleteList[numRemoved] = temp;
+									numRemoved++;
+								}
+								temp = temp.prevVal;
+							}
 						}
 						verticalSearch = verticalSearch.up;
 					}
@@ -1036,9 +1100,9 @@ public class Interface {
 		}
 
 		int[] returnArray = new int[4];
-		returnArray[0] = topLeft;
-		returnArray[1] = bottomLeft;
-		returnArray[2] = topRight;
+		returnArray[0] = topRight;
+		returnArray[1] = topLeft;
+		returnArray[2] = bottomLeft;
 		returnArray[3] = bottomRight;
 		return returnArray;
 	}
@@ -1048,6 +1112,7 @@ public class Interface {
 		origin.down = null;
 		origin.left = null;
 		origin.right = null;
+		numNodes = 0;
 	}
 
 	//ADD HELPER FUNCTIONS BELOW
@@ -1124,6 +1189,7 @@ public class Interface {
 			currHead.down = null;
 		}
 
+		newHead.nextVal = null;
 		currHead.prevVal = null;
 		currHead.nextVal = null;
 	}
