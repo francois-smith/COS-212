@@ -4,6 +4,7 @@ public class Interface {
 
 	private Node origin;
 	public int numNodes = 0, counter = 0;
+	public boolean test = false;
 
 	private String floatFormatter(float value){
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -732,12 +733,7 @@ public class Interface {
 		else{
 			Node returnNode = null;
 
-			float high = toArray()[0].getValue();
-			for (Node node : toArray()){
-				if (node.getValue() > high){
-					high = node.getValue();
-				}
-			}
+			float high = findMaxValue();
 				
 			Node[] highestValArray = new Node[numNodes];
 			int i = 0;
@@ -825,12 +821,7 @@ public class Interface {
 		else{
 			Node returnNode = null;
 
-			float min = toArray()[0].getValue();
-			for (Node node : toArray()){
-				if (node.getValue() < min){
-					min = node.getValue();	
-				}
-			}
+			float min = findMinValue();
 				
 			Node[] minValArray = new Node[numNodes];
 			int i = 0;
@@ -951,7 +942,6 @@ public class Interface {
 	public int removeAllFunctionPoints(String functionName){
 		int numRemoved = 0;
 		Node searchNode = origin;
-		Node[] deleteList = new Node[numNodes];
 
 		while(searchNode.left != null){
 			searchNode = searchNode.left;
@@ -975,35 +965,49 @@ public class Interface {
 					else{
 						if(verticalSearch.prevVal == null){
 							if(verticalSearch.getFunction().getFunctionName().equals(functionName)){
-								deleteList[numRemoved] = verticalSearch;
-								numRemoved++;
+								Node temp = verticalSearch;
+								verticalSearch = verticalSearch.up;
+								removePoint(temp.getVariables()[0], temp.getVariables()[1]);
+								continue;
 							}
 						}
 						else {
 							Node temp = verticalSearch;
-							while(temp != null)
-							{	
-								if(temp.getFunction().getFunctionName().equals(functionName)){
-									deleteList[numRemoved] = temp;
-									numRemoved++;
+							while(temp != null) {
+								if(temp.getFunction().getFunctionName() == functionName){
+									if(temp.nextVal == null){
+										Node deleteNode = temp;
+										temp = temp.prevVal;
+										removePoint(deleteNode.getVariables()[0], deleteNode.getVariables()[1]);
+									}
+									else if(temp.prevVal != null && temp.nextVal != null){
+										Node deleteNode = temp;
+										temp = temp.prevVal;
+										deleteNode.prevVal = deleteNode.nextVal;
+										deleteNode.nextVal = deleteNode.prevVal;
+										deleteNode.prevVal = null;
+										deleteNode.nextVal = null;
+										numRemoved++;
+									}
+									else if(temp.prevVal == null){
+										temp.nextVal.prevVal = null;
+										temp.nextVal = null;
+										numRemoved++;
+										temp = temp.prevVal;
+									}
+									continue;
 								}
 								temp = temp.prevVal;
 							}
 						}
 						verticalSearch = verticalSearch.up;
 					}
-					
 				}
 				searchNode = searchNode.right;
 			}
 		}
 
-		for (Node node : deleteList) {
-			if (node != null){
-				removePoint(node.getVariables()[0], node.getVariables()[1]);
-			}
-		}
-
+		numNodes -= numRemoved;
 		return numRemoved;
 	}
 
@@ -1151,17 +1155,19 @@ public class Interface {
 			}
 			else {
 				Node temp = oldNode;
-				while(temp != null && newNode.getFunction().getFunctionName().compareTo(temp.getFunction().getFunctionName()) < 0){
+				while(temp.prevVal != null && temp.prevVal.getFunction().getFunctionName().compareTo(newNode.getFunction().getFunctionName()) < 0){
 					temp = temp.prevVal;
 				}
 
 				if(temp.prevVal == null){
 					temp.prevVal = newNode;
+					newNode.nextVal = temp;
 				}
 				else {
 					newNode.prevVal = temp.prevVal;
+					newNode.nextVal = temp;
+					temp.prevVal.nextVal = newNode;
 					temp.prevVal = newNode;
-					newNode.prevVal.nextVal = newNode;
 				}	
 			}
 		}

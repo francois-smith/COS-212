@@ -1,9 +1,9 @@
 public class main {
     public static void main(String[] args) {
+       
+        /*System.out.println("========CREATING AN INTERFACE (KYLE)========");
 
         Interface Kyle = new Interface();
-
-        System.out.println("========CREATING AN INTERFACE (KYLE)========");
 
         Node curK = Kyle.getOrigin();
 
@@ -63,7 +63,7 @@ public class main {
 
         TashaArr[0] = new Node(new ExampleFunction1().clone(), 20, 20);
 
-        Node test = new Node(new ExampleFunction1().clone(), -50, 20);
+        Node test = new Node(new ExampleFunction2().clone(), -50, 20);
         ExampleFunction2 func = new ExampleFunction2();
         test.setFunction(func);
 
@@ -167,8 +167,8 @@ public class main {
         System.out.println("\n========Printing Points by Function========");
 
         System.out.println("\nTasha");
-        System.out.println(Tasha.printFunctionValues((new ExampleFunction1()).getFunctionName())  + "// 5 Nodes");
-        System.out.println(Tasha.printFunctionValues((new ExampleFunction2()).getFunctionName())  + "       // 1 Node");
+        System.out.println(Tasha.printFunctionValues((new ExampleFunction1()).getFunctionName())  + "// 4 Nodes");
+        System.out.println(Tasha.printFunctionValues((new ExampleFunction2()).getFunctionName())  + "       // 2 Node");
         System.out.println(Tasha.printFunctionValues((new ExampleFunction3()).getFunctionName())  + " // 3 Nodes");
         System.out.println(Tasha.printFunctionValues((new ExampleFunction4()).getFunctionName())  + "  // 3 Nodes");
 
@@ -502,6 +502,8 @@ public class main {
                 Kyle.addPoint(new ExampleFunction1(), i, j);
             }
         }
+
+        Kyle.test = true;
         for(int i=-3; i <= 3; i++) //Big square around origin
         {
             for(int j=3; j >= -3; j--)
@@ -509,6 +511,7 @@ public class main {
                 Kyle.addPoint(new ExampleFunction3(), i, j);
             }
         }
+        Kyle.test = false;
 
         curK = Kyle.getOrigin();
         curK = curK.left;
@@ -567,9 +570,8 @@ public class main {
         
 
 
-
-        Kyle.removeAllFunctionPoints("Example function 3");
         Kyle.removeAllFunctionPoints("Example function 4");
+        Kyle.removeAllFunctionPoints("Example function 3");
         Kyle.removeAllFunctionPoints("Example function 1");
 
         Kyle.removePoint(1, -1);
@@ -645,6 +647,8 @@ public class main {
             System.out.println("");
         }
 
+        */
+
         System.out.println("\n========START OF ORIGINAL MAIN========");
         Interface interface1 = new Interface();
         for(int i=-1; i <= 1; i++)
@@ -698,6 +702,7 @@ public class main {
             System.out.println("Problem");
         System.out.println(n4.getFunction().getFunctionName());
         System.out.println(n4.getValue() + " == " + interface1.calculateValue((new ExampleFunction2()), 1, 1));
+        
     }
 }
 
@@ -887,7 +892,7 @@ V1: 20 V2: 0 V1Axis Axis v1 test 6 left
 
 ========Removing Function 2 Nodes========
 Tasha
-399;30;30;40;40// 4 Nodes
+399;30;40;40// 4 Nodes
 // 0 Nodes Goodbye
 -2205;-300 // 2 Nodes
 -380;-379  // 2 Nodes
