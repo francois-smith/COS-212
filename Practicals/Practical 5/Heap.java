@@ -31,8 +31,12 @@ public abstract class Heap<T extends Comparable<T>> {
     ////// Implement the functions below this line //////
 
     protected boolean isEmpty() {
-
-        //Your code goes here
+        if(currentSize == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     public abstract void insert(T elem);
