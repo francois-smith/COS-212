@@ -51,7 +51,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
 
     Node<T> insert(Node<T> node, T data) {
-
+        return null;
     }
 
     /**
@@ -59,6 +59,6 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
      * If the data is not in the tree, return the given node / root.
      */
     Node<T> removeNode(Node<T> root, T data) {
-
+        return null;
     }
 }
