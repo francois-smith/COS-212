@@ -46,28 +46,41 @@ public class AvlTree<T extends Comparable<T>> {
             return node;
         }
 
-        node.height = 1 + getMax(getHeight(node.left), getHeight(node.right));
+        node.height = getMax(getHeight(node.left), getHeight(node.right)) + 1;
 
         int balanceFactor = returnBalanceFactor(node);
 
-        if(balanceFactor > 1 && data.compareTo(node.left.data) < 0){
-            return rightRotation(node);
+        if(balanceFactor > 1 && node.left == null){
+            return leftRotation(node);
         }
 
-        if(balanceFactor > 1 && data.compareTo(node.left.data) > 0){
+        if(balanceFactor > 1 && node.left != null && data.compareTo(node.left.data) < 0){
+            return rightRotation(node);
+        }
+        
+        if(balanceFactor > 1 && node.left != null && data.compareTo(node.left.data) > 0){
             node.left = leftRotation(node.left);
             return rightRotation(node);
         }
 
-        if( balanceFactor < -1 && data.compareTo(node.right.data) < 0){
+
+        if(balanceFactor < -1 && node.right == null){
+            return rightRotation(node);
+        }
+
+        if(balanceFactor > 1 && node.left == null){
+            return leftRotation(node);
+        }
+
+        if( balanceFactor < -1 && node.right != null && data.compareTo(node.right.data) < 0){
             node.right = rightRotation(node.right);
             return leftRotation(node);
         }
 
-        if (balanceFactor < -1 && data.compareTo(node.right.data) > 0){
+        if (balanceFactor < -1 && node.right != null && data.compareTo(node.right.data) > 0){
             return leftRotation(node);
         }
-            
+ 
         return node;
     }
 
@@ -79,7 +92,7 @@ public class AvlTree<T extends Comparable<T>> {
 
     Node<T> removeNode(Node<T> root, T data) {
         if(root == null){
-            return root;
+            return null;
         }
 
         if(data.compareTo(root.data) < 0){
@@ -91,7 +104,7 @@ public class AvlTree<T extends Comparable<T>> {
         else{
             if(root.left == null || root.right == null){
                 Node<T> childNode = null;
-                if(root.right == childNode){
+                if(childNode == root.right){
                     childNode = root.left;
                 }
                 else{
@@ -148,35 +161,73 @@ public class AvlTree<T extends Comparable<T>> {
 
     /* Helper Functions */
 
-    Node<T> rightRotation(Node<T> root){
-        Node<T> child = root.left;
+    Node<T> rightRotation(Node<T> node){
+        Node<T> child = node.left;
         Node<T> grandChild = child.right;
 
-        child.right = root;
-        root.left = grandChild;
+        child.right = node;
+        if(grandChild != null){
+            node.left = grandChild;
+        }
+        else{
+            node.left = null;
+        }
 
-        root.height = getMax(getHeight(root.left), getHeight(root.right)) + 1;
-        child.height = getMax(getHeight(child.left), getHeight(child.right)) + 1;
 
+        if(node.left == null && node.right == null){
+            node.height = 0;
+        }
+        else{
+            node.height = getMax(getHeight(node.left), getHeight(node.right)) + 1;
+        }
+        
+        if(child.left == null && child.right == null){
+            child.height = 0;
+        }
+        else{
+            child.height = getMax(getHeight(child.left), getHeight(child.right)) + 1;
+        }
+        
         return child;
     }
 
-    Node<T> leftRotation(Node<T> root){
-        Node<T> child = root.right;
+    Node<T> leftRotation(Node<T> node){
+        Node<T> child = node.right;
         Node<T> grandChild = child.left;
 
-        child.left = root;
-        root.right = grandChild;
+        child.left = node;
+        if(grandChild != null){
+            node.right = grandChild;
+        }else{
+            node.right = null;
+        }
 
-        root.height = getMax(getHeight(root.left), getHeight(root.right)) + 1;
-        child.height = getMax(getHeight(child.left), getHeight(child.right)) + 1;
-
+        if(node.left == null && node.right == null){
+            node.height = 0;
+        }
+        else{
+            node.height = getMax(getHeight(node.left), getHeight(node.right)) + 1;
+        }
+        
+        if(child.left == null && child.right == null){
+            child.height = 0;
+        }
+        else{
+            child.height = getMax(getHeight(child.left), getHeight(child.right)) + 1;
+        }
         return child;
     }
 
     int returnBalanceFactor(Node<T> node){
-        if(node == null) return 0;
-        return getHeight(node.left) - getHeight(node.right);
+        int returnValue = 0;
+        if(node.right != null){
+            returnValue += getHeight(node.right) +1;
+        }
+        if(node.left != null){
+            returnValue -= getHeight(node.left) +1;
+        }
+
+        return returnValue;
     }
 
     int getMax(int value1, int value2) {
