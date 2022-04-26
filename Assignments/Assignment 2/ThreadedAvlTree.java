@@ -1,3 +1,5 @@
+import javax.naming.PartialResultException;
+
 public class ThreadedAvlTree<T extends Comparable<T>> {
     public Node<T> root;
 
@@ -27,7 +29,8 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         Node<T> cur = getLeftMost(node);
 
         while (cur != null) {
-            System.out.print(" " + cur.data + " ");
+            //System.out.print(" " + cur.data + " ");
+            System.out.println("Node: "+cur.data + " has a height of: " + cur.height + " and a balance of: " + getBalanceFactor(cur) + "\n");
 
             if (cur.rightThread == true)
                 cur = cur.right;
@@ -145,14 +148,20 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         
         prev = getParent(curr);
         if(prev == null){
-            this.root = deleteWithChildren(curr, null);
+            if(this.root.right == null && this.root.left == null){
+                this.root = deleteWithNoChildren(curr, null);
+            }
+            else{
+                this.root = deleteWithChildren(curr, null);
+            }
+            
             
             Node<T> startPoint = curr;
             if(curr.left != null){
                 startPoint = curr.left;
             }
 
-            adjustHeights(curr);
+            adjustHeights(this.root);
             Node<T> grandparent = null;
             Node<T> parent = startPoint;
             while(parent != null){
@@ -163,7 +172,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         }
         else if(curr.left != null || curr.rightThread == false){
             curr = deleteWithChildren(curr, prev);
-            
+
             Node<T> startPoint = curr;
             if(curr.left != null){
                 startPoint = curr.left;
@@ -191,6 +200,8 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             }
         }
 
+    
+        adjustHeights(this.root);
         return this.root;
     } 
 
@@ -240,7 +251,17 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             successor.rightThread = false;
         }
         else if(node.rightThread == false){
-            child = nodeRef.right;
+            successor = nodeRef.right;
+        }
+
+        if (parent == null){
+            this.root = successor;
+        }
+        else if (nodeRef == parent.left){
+            parent.left = successor;
+        }  
+        else{
+            parent.right = successor;
         }
 
         return successor;
@@ -268,6 +289,18 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
     private Node<T> checkBalance(Node<T> node, Node<T> grandparent){
         int balanceFactor = getBalanceFactor(node);
+
+        if(grandparent == null){
+            if(balanceFactor > 1 && getBalanceFactor(node.right) > 0){
+                leftRotation(node);
+            }
+    
+            if (balanceFactor < -1 && getBalanceFactor(node.left) < 0){
+                rightRotation(node);
+            }
+    
+            return node;
+        }
 
         if(balanceFactor > 1 && getBalanceFactor(node.right) <= 0){
             node.right = rightRotation(node.right);
@@ -372,5 +405,37 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
         adjustHeights(root);
         return child;
+    }
+
+    public int updateHeight(Node<T> node){
+        int left = 0, right = 0;
+        if(node == null){
+            System.out.println("Null node!");
+            return 0; 
+        }
+        if(node.left == null && node.right == null){//rightmost leaf node 
+            node.height = 0;
+            System.out.println("Leaf node: "+ node.data+ " height: "+ node.height);
+            return 0;
+        }
+        if(node.left != null){
+            System.out.println("Go left from: "+ node.data);
+            left = 1 + updateHeight(node.left);//calc height of left subtree
+        }
+        if(node.rightThread){//right threaded node, don't follow thread
+            node.height = 0;
+            System.out.println("Right Thread leaf node reached! Node: "+ node.data + " Right thread to: "+ node.right.data);
+            return 0;
+        }
+        if(node.right != null && !node.rightThread){
+            System.out.println("Go right from: "+ node.data);
+            right = 1 + updateHeight(node.right); //calc height of right subtree
+        }
+        //set height of node to be height of longest subtree
+        if(left > right) node.height = left;
+        else node.height = right;
+        System.out.println("Node: "+ node.data+ " height: "+ node.height);
+        //return the height for recursion
+        return node.height;
     }
 }
