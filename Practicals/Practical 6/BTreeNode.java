@@ -73,7 +73,7 @@ class BTreeNode<T extends Comparable<T>> {
 	public BTreeNode<T> insert(T key){
 		if (this.keyTally == 2*m-1)
 		{
-			BTreeNode<T> newNode = new BTreeNode(m, false);
+			BTreeNode<T> newNode = new BTreeNode<T>(m, false);
 			newNode.references[0] = this;
 			newNode.splitNode(0, this);
 	
@@ -94,30 +94,42 @@ class BTreeNode<T extends Comparable<T>> {
 	// Function to search a key in a subtree rooted with this node
 	public BTreeNode<T> search(T key){  
 		int index = 0;
-		while(index < this.keyTally-1 && this.keys[index].compareTo(key) < 0){
+
+		//find a key greater than or equal to K
+		while(index < keyTally && key.compareTo((T)keys[index]) > 0){
 			index++;
 		}
-		if(keys[index] == key){
+
+		//if the key is found then return this node
+		if(keys[index-1] == key){
 			return this;
 		}
-		if(leaf == true){
+
+		//return null if key was not found and it is a leaf
+		if(leaf){
 			return null;
 		}
-		return references[index].search(key);
+		else{
+			//Search child for key
+			return references[index-1].search(key);
+		}
 	}
 
 	// Function to traverse all nodes in a subtree rooted with this node
 	public void traverse(){
 		int index;
+
+		//traverse the keys, if it is not a leaf go to child node first.
 		for(index = 0; index < keyTally; index++){
 			if(!leaf){
 				references[index].traverse();
 			}
-			System.out.print(this.keys[index] + " ");
+			System.out.print(" " + keys[index]);
 		}
 
+		//traverse the missed node
 		if(!leaf){
-			this.references[index].traverse();
+			references[index].traverse();
 		}
 	}
 
@@ -161,22 +173,53 @@ class BTreeNode<T extends Comparable<T>> {
 		}
 	}
 
+	//helper function for printing a node(only used for debugging)
+	public void printNode(){
+		String isLeaf = "";
+		if(leaf){
+			isLeaf = "is a leaf";
+		}
+		else{
+			isLeaf = "is not a leaf";
+		}
+
+		String output = "Keys = ["; 
+		for (int i = 0; i < keyTally; i++) {
+			output += keys[i] + ",";
+		}
+		System.out.println(output + "] that " + isLeaf);
+
+		output = "References = "; 
+		int num = 0;
+		for (BTreeNode<T> node : references) {
+			if(node != null){
+				num++;
+			}
+		}
+		System.out.println(output + num);
+
+		output = "Key Tally = "; 
+		System.out.println(output + keyTally + "\n");
+	}
+
 	//helper function to split a full node
-	public void splitNode(int i, BTreeNode<T> node){
+	public void splitNode(int index, BTreeNode<T> node){
 		//create a new node node that will have the m - 1 amount of keys
-		BTreeNode<T> newNode = new BTreeNode(node.m, node.leaf);
+		BTreeNode<T> newNode = new BTreeNode<T>(node.m, node.leaf);
 		newNode.keyTally = m - 1;
 	
 		//copy the second half of keys to the new node
-		for (int j = 0; j < m-1; j++){
-			newNode.keys[j] = node.keys[j+m];
+		for (int i = 0; i < m-1; i++){
+			newNode.keys[i] = node.keys[i+m];
+			node.keys[i+m] = null;
 		}
 	
 		//if it was not a leaf then copy the corrisponding references
 		if (!node.leaf)
 		{
-			for (int j = 0; j < m; j++){
-				newNode.references[j] = node.references[j+m];
+			for (int i = 0; i < m; i++){
+				newNode.references[i] = node.references[i+m];
+				node.references[i+m] = null;
 			}
 		}
 	
@@ -184,20 +227,20 @@ class BTreeNode<T extends Comparable<T>> {
 		node.keyTally = m - 1;
 	
 		//create new child space
-		for (int j = keyTally; j >= i + 1; j--){
-			references[j+1] = references[j];
+		for (int i = keyTally; i >= index + 1; i--){
+			references[i+1] = references[i];
 		}
 		
 		//link the new child to this node
-		references[i+1] = newNode;
+		references[index+1] = newNode;
 	
 		//a key from the inputted node will move to this one, insert it into place
-		for (int j = keyTally-1; j >= i; j--){
-			keys[j+1] = keys[j];
+		for (int i = keyTally-1; i >= index; i--){
+			keys[i+1] = keys[i];
 		}
 	
 		//copy the middle key of the inputted node to this one 
-		keys[i] = node.keys[m-1];
+		keys[index] = node.keys[m-1];
 		node.keys[m-1] = null;
 	
 		//increment the key tally
