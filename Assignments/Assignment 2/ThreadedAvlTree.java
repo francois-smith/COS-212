@@ -27,8 +27,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         Node<T> cur = getLeftMost(node);
 
         while (cur != null) {
-            //System.out.print(" " + cur.data + " ");
-            System.out.println("Node: "+cur.data + " has a height of: " + cur.height + " and a balance of: " + getBalanceFactor(cur) + "\n");
+            System.out.print(" " + cur.data + " ");
 
             if (cur.rightThread == true)
                 cur = cur.right;
@@ -39,9 +38,17 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
     /* Do not edit the code above */
 
-
     void convertAVLtoThreaded(Node<T> node) {
-
+        if(node == null){
+            return;
+        }
+        insert(node, node.data);
+        if(node.left != null){
+            convertAVLtoThreaded(node.left);
+        } 
+        if(node.right != null){
+            convertAVLtoThreaded(node.right);
+        } 
     }
 
     /**
@@ -117,8 +124,127 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
      * If the data is not in the tree, return the given node / root.
      */
     Node<T> removeNode(Node<T> root, T data) {
-        return null;
+        if(this.root == null){
+            return null;
+        }
+
+        Node<T> prev = null;
+        Node<T> curr = getLeftMost(root);
+        while (curr != null && curr.data.compareTo(data) != 0) {
+            if (curr.rightThread == true){
+                curr = curr.right;
+            }   
+            else{
+                curr = getLeftMost(curr.right);
+            }     
+        }
+
+        if(curr == null){
+            return this.root;
+        }
+        
+        prev = getParent(curr);
+        if(prev == null){
+            this.root = deleteWithChildren(curr, null);
+            
+            Node<T> startPoint = curr;
+            if(curr.left != null){
+                startPoint = curr.left;
+            }
+
+            adjustHeights(curr);
+            Node<T> grandparent = null;
+            Node<T> parent = startPoint;
+            while(parent != null){
+                grandparent = getParent(parent);
+                parent = checkBalance(parent, grandparent);
+                parent = grandparent;
+            }
+        }
+        else if(curr.left != null || curr.rightThread == false){
+            curr = deleteWithChildren(curr, prev);
+            
+            Node<T> startPoint = curr;
+            if(curr.left != null){
+                startPoint = curr.left;
+            }
+
+            adjustHeights(this.root);
+            Node<T> grandparent = null;
+            Node<T> parent = startPoint;
+            while(parent != null){
+                grandparent = getParent(parent);
+                parent = checkBalance(parent, grandparent);
+                parent = grandparent;
+            }
+        }
+        else if(curr.left == null && curr.rightThread == true){
+            curr = deleteWithNoChildren(curr, prev);
+
+            adjustHeights(this.root);
+            Node<T> grandparent = null;
+            Node<T> parent = prev;
+            while(parent != null){
+                grandparent = getParent(parent);
+                parent = checkBalance(parent, grandparent);
+                parent = grandparent;
+            }
+        }
+
+        return this.root;
     } 
+
+    private Node<T> deleteWithNoChildren(Node<T> node, Node<T> parent){
+        Node<T> nodeRef = node;
+
+        if(parent == null){
+            node = null;
+        }
+        else if(nodeRef == parent.right){
+            parent.rightThread = true;
+            parent.right = nodeRef.right;
+        }
+        else{
+            parent.left = null;
+        }
+
+        return node;
+    }
+
+    private Node<T> deleteWithChildren(Node<T> node, Node<T> parent){
+        Node<T> nodeRef = node;
+        Node<T> child = null;
+        Node<T> successor = null;
+
+        if(nodeRef.left != null){
+            child = nodeRef.left;
+            successor = child;
+
+            while(successor.right != null && successor.rightThread == false){
+                successor = successor.right;
+            }
+
+            if(successor != child){
+                if(successor.left != null){
+                    Node<T> par = getParent(successor);
+                    par.right = successor.left;
+                }
+                else{
+                    if(child.right == successor){
+                        child.rightThread = true;
+                    }
+                }
+                successor.left = child;
+            }
+            successor.right = nodeRef.right;
+            successor.rightThread = false;
+        }
+        else if(node.rightThread == false){
+            child = nodeRef.right;
+        }
+
+        return successor;
+    }
 
     private Node<T> getParent(Node<T> node){
         Node<T> nodePtr = root;
@@ -145,7 +271,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
         if(balanceFactor > 1 && getBalanceFactor(node.right) <= 0){
             node.right = rightRotation(node.right);
-            grandparent.left = leftRotation(node);
+            grandparent.right = leftRotation(node);
         }
 
         if(balanceFactor > 1 && getBalanceFactor(node.right) > 0){
@@ -154,7 +280,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
         if(balanceFactor < -1 && getBalanceFactor(node.left) >= 0){
             node.left = leftRotation(node.left);
-            grandparent.right = rightRotation(node);
+            grandparent.left = rightRotation(node);
         }
 
         if (balanceFactor < -1 && getBalanceFactor(node.left) < 0){
@@ -204,8 +330,13 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             grandChild = child.right;
         }
     
-        child.right = node;
-        child.rightThread = false;
+        if(child.rightThread == true){
+            child.rightThread = false;
+        }
+        else{
+            child.right = node;
+        }
+
         if(grandChild != null){
             node.left = grandChild;
         }
@@ -218,6 +349,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         }
 
         adjustHeights(root);
+
         return child;
     }
 
