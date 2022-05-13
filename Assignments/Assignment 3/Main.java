@@ -5,18 +5,8 @@ public class Main {
     {
 	//General tree
 	BPTree<Integer, Integer> tree = new BPTree<Integer, Integer>(4); // A B+ Tree with order 4
-   
-	tree.insert(20, 5000);
-	tree.insert(10, 1000);
-	tree.insert(30, 9000);
-	tree.insert(50, 8000);
-	tree.insert(40, 2000);
-	tree.insert(60, 1200);
-	tree.insert(70, 2200);
 
-	System.out.println("Structure of the constucted tree is: ");
-	tree.print();
-	/*
+	
 	tree.insert(20, 5000);
 	tree.insert(10, 1000);
 	tree.insert(30, 9000);
@@ -30,6 +20,7 @@ public class Main {
 	System.out.println("Structure of the constucted tree is: ");
 	tree.print();
 
+	/*
 	Integer value = 70; // Delete leaf also internal
 	tree.delete(value);
 	System.out.println("Structure of the tree after delete of: " + value);
