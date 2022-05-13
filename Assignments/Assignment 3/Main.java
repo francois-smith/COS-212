@@ -11,6 +11,15 @@ public class Main {
 	tree.insert(30, 9000);
 	tree.insert(50, 8000);
 	tree.insert(40, 2000);
+
+	System.out.println("Structure of the constucted tree is: ");
+	tree.print();
+	/*
+	tree.insert(20, 5000);
+	tree.insert(10, 1000);
+	tree.insert(30, 9000);
+	tree.insert(50, 8000);
+	tree.insert(40, 2000);
 	tree.insert(60, 7000);
 	tree.insert(90, 3000);
 	tree.insert(70, 6000);
@@ -112,7 +121,7 @@ public class Main {
 	} else
 		System.out.println("Index empty!");
 
-	/* Expected Output:
+	Expected Output:
 	Structure of the constucted tree is:
 	Level 1 [ 30 50 70]
 	Level 2 [ 10 20]
