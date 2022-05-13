@@ -14,7 +14,6 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	protected BPTreeNode<TKey, TValue> rightSibling;
 	protected static int level = 0; // do not modify this variable's value as it is used for printing purposes. You can create another variable with a different name if you need to store the level.
 	
-
 	protected BPTreeNode() 
 	{
 		this.keyTally = 0;
@@ -102,21 +101,16 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 */
 	public TValue search(TKey key) 
 	{
-		// Your code goes here
+		return null;
 	}
-
-
 
 	/**
 	 * Insert a new key and its associated value into the B+ tree. The root node of the
 	 * changed tree should be returned.
 	 */
-	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value) 
-	{
-		// Your code goes here
+	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value){
+		return this; //Will never be a BPTreeNode, rather a inherited class
 	}
-
-
 
 	/**
 	 * Delete a key and its associated value from the B+ tree. The root node of the
@@ -124,10 +118,8 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 */
 	public BPTreeNode<TKey, TValue> delete(TKey key) 
 	{
-		// Your code goes here
+		return this; //Will never be a BPTreeNode, rather a inherited class
 	}
-
-
 
 	/**
 	 * Return all associated key values on the B+ tree in ascending key order using the sequence set. An array
@@ -136,7 +128,9 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	@SuppressWarnings("unchecked")
 	public TValue[] values() 
 	{
-		// Your code goes here
+		return null;
 	}
 
+
+	//=============================Helper Functions================================
 }
