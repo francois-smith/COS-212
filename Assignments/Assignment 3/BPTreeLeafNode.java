@@ -32,6 +32,13 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 
 	////// You should not change any code above this line //////
 
+	////// Implement functions below this line //////
+
+	/**
+	 * Override of default insert class.
+	 * Inserts keys into leaf nodes.
+	 * If leaf node is full after insert, then apply a split.
+	 */
 	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value){
 		//get current key count of node
 		int keyCount = this.getKeyCount();
@@ -93,7 +100,12 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 		return this;
 	}
 
-	public BPTreeInnerNode<TKey, TValue> leafNodeSplit(BPTreeLeafNode<TKey, TValue> leaf){
+	/**
+	 * Recieves a full leaf node.
+	 * Splits it into 2 leaf nodes parented by 1 inner node, returns parent.
+	 * If parent existed then new references are added
+	 */
+	private BPTreeInnerNode<TKey, TValue> leafNodeSplit(BPTreeLeafNode<TKey, TValue> leaf){
 		//create new nodes that will be used to split old leaf node
 		BPTreeLeafNode<TKey, TValue> leftLeaf = new BPTreeLeafNode<TKey, TValue>(leaf.m);
 		BPTreeLeafNode<TKey, TValue> rightLeaf= new BPTreeLeafNode<TKey, TValue>(leaf.m);
@@ -171,7 +183,9 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 		return newParent;
 	}
 
-	////// Implement functions below this line //////
+	/**
+	 * Override of default delete class.
+	 */
 	// public BPTreeNode<TKey, TValue> delete(TKey key){
 	// 	for(int i = 0; i < this.getKeyCount(); i++){
 	// 		if(this.getKey(i).equals(key)){
