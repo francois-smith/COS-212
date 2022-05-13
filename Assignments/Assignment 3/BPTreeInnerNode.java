@@ -36,4 +36,44 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 
 	////// Implement functions below this line //////
 
+	/**
+	 * Called from child class.
+	 * Send key to add.
+	 * Send back index key was added to update references within child.
+	 */
+	public int addChildKey(TKey key){
+		//get current key count of node
+		int keyCount = this.getKeyCount();
+		
+		for(int index = 0; index < keyCount; index++){
+			//check if current index is greater than key to be inserted
+			if(this.getKey(index).compareTo(key) > 0){
+				//move up all values to make space for new key
+				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
+					this.setKey(moveIndex, this.getKey(moveIndex-1));
+				}
+
+				//move up all references to make space for new reference
+				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
+					this.setChild(moveIndex, this.getChild(moveIndex-1));
+				}
+
+
+				this.setKey(index, key);
+				this.keyTally++;
+				return index;
+			}
+
+			//if key to be inserted is larger than all existing keys
+			if(index+1 == keyCount){
+				//set index to be inserted into, to be after all existing values
+				index++;
+				this.setKey(index, key);
+				this.keyTally++;
+				return index;
+			}
+		}
+
+		return 0;
+	}
 }
