@@ -11,6 +11,8 @@ public class Main {
 	tree.insert(30, 9000);
 	tree.insert(50, 8000);
 	tree.insert(40, 2000);
+	tree.insert(60, 1200);
+	tree.insert(70, 2200);
 
 	System.out.println("Structure of the constucted tree is: ");
 	tree.print();

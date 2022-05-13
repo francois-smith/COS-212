@@ -99,8 +99,7 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 * Search a key on the B+ tree and return its associated value using the index set. If the given key 
 	 * is not found, null should be returned.
 	 */
-	public TValue search(TKey key) 
-	{
+	public TValue search(TKey key) {
 		return null;
 	}
 
@@ -109,16 +108,15 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 * changed tree should be returned.
 	 */
 	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value){
-		return this; //Will never be a BPTreeNode, rather a inherited class
+		return this; //Will never be a BPTreeNode, rather an inherited class
 	}
 
 	/**
 	 * Delete a key and its associated value from the B+ tree. The root node of the
 	 * changed tree should be returned.
 	 */
-	public BPTreeNode<TKey, TValue> delete(TKey key) 
-	{
-		return this; //Will never be a BPTreeNode, rather a inherited class
+	public BPTreeNode<TKey, TValue> delete(TKey key){
+		return this; //Will never be a BPTreeNode, rather an inherited class
 	}
 
 	/**
@@ -126,8 +124,7 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 * of the key values should be returned.
 	 */
 	@SuppressWarnings("unchecked")
-	public TValue[] values() 
-	{
+	public TValue[] values(){
 		return null;
 	}
 

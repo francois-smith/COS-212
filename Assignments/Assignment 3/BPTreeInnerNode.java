@@ -44,7 +44,7 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 	public int addChildKey(TKey key){
 		//get current key count of node
 		int keyCount = this.getKeyCount();
-		
+
 		for(int index = 0; index < keyCount; index++){
 			//check if current index is greater than key to be inserted
 			if(this.getKey(index).compareTo(key) > 0){
@@ -75,5 +75,9 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 		}
 
 		return 0;
+	}
+
+	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value){
+		return null;
 	}
 }
