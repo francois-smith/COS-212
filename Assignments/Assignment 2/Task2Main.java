@@ -260,10 +260,10 @@ public class Task2Main
         tree.root = tree.removeNode( tree.root, 9 );
 
         assertEquals( tree.root.data, 8 );
-        assertEquals( tree.root.right.data, 24 );
+        assertEquals( tree.root.right.data, 16 );
         assertEquals( tree.root.right.left.data, 11 );
-        assertEquals( tree.root.right.left.right.data, 16 );
-        assertEquals( tree.root.right.right.data, 34 );
+        assertEquals( tree.root.right.right.data, 24 );
+        assertEquals( tree.root.right.right.right.data, 34 );
 
         testEnd();
 

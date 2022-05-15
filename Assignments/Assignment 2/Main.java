@@ -66,30 +66,28 @@ public class Main {
 }
 
 /*
-Expected output
----------------------------
-Inorder traversal of constructed tree is :
-14 20 25 35
-Tree Height is: 2
-Inorder traversal of constructed tree is :
-14 20 25 35 65 80
-Tree Height is: 2
-Inorder traversal of constructed tree is :
-14 20 25 35 65 80 82
-Tree Height is: 3
-Inorder traversal of constructed tree is :
-14 20 25 35 65 82
-Tree Height is: 2
+        Expected output
+        ---------------------------
+        Inorder traversal of constructed tree is :
+        14 20 25 35
+        Tree Height is: 2
+        Inorder traversal of constructed tree is :
+        14 20 25 35 65 80
+        Tree Height is: 2
+        Inorder traversal of constructed tree is :
+        14 20 25 35 65 80 82
+        Tree Height is: 3
+        Inorder traversal of constructed tree is :
+        14 20 25 35 65 82
+        Tree Height is: 2
 
-Inorder traversal of constructed threaded avl tree is :
-14 20 25 35 65 82
-Tree Height is: 2
-Inorder traversal of constructed threaded avl tree is :
-14 20 25 35 50 65 82 91
-Tree Height is: 3
-Inorder traversal of constructed threaded avl tree is :
-14 20 25 35 50 65 82
-Tree Height is: 3
-
-
+        Inorder traversal of constructed threaded avl tree is :
+        14 20 25 35 65 82
+        Tree Height is: 2
+        Inorder traversal of constructed threaded avl tree is :
+        14 20 25 35 50 65 82 91
+        Tree Height is: 3
+        Inorder traversal of constructed threaded avl tree is :
+        14 20 25 35 50 65 82
+        Tree Height is: 3
  */
