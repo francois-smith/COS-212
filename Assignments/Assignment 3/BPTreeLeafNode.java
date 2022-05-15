@@ -36,8 +36,8 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 
 	/**
 	 * Override of default insert class.
-	 * Inserts keys into leaf nodes.
-	 * If leaf node is full after insert, then apply a split.
+	 * Inserts key and value pair into a leaf node.
+	 * If leaf node is full after insert, then split it.
 	 */
 	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value){
 		//get current key count of node
@@ -47,57 +47,51 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 		if(keyCount < m){ 
 			//the leaf is empty(root case)(first insert)
 			if(keyCount == 0){ 
-				this.setKey(0, key);
-				this.setValue(0, value);
-				this.keyTally++;
+				insertKey(key, value, 0);
 				return this;
 			}
-
 			//if leaf is not empty
-			for(int index = 0; index < keyCount; index++){
-				//check if current index is greater than key to be inserted
-				if(this.getKey(index).compareTo(key) > 0){
-					//move up all values to make space for new key
-					for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
-						this.setKey(moveIndex, this.getKey(moveIndex-1));
-						this.setValue(moveIndex, this.getValue(moveIndex-1));
+			else{
+				for(int index = 0; index < keyCount; index++){
+					//check if current index is greater than key to be inserted
+					if(this.getKey(index).compareTo(key) > 0){
+						//move up all values to make space for new key
+						for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
+							this.setKey(moveIndex, this.getKey(moveIndex-1));
+							this.setValue(moveIndex, this.getValue(moveIndex-1));
+						}
+
+						//insert key into empty space
+						insertKey(key, value, index);
+						break;
 					}
-
-					//insert key into empty space
-					this.setKey(index, key);
-					this.setValue(index, value);
-					this.keyTally++;
-
-					//break out of loop to complete insert
-					break;
-				}
-
-				//if key to be inserted is larger than all existing keys
-				if(index+1 == keyCount){
-					//set index to be inserted into, to be after all existing values
-					index++;
-
-					//insert key into last index
-					this.setKey(index, key);
-					this.setValue(index, value);
-					this.keyTally++;
-
-					//break out of loop to complete insert
-					break;
+					//if key to be inserted is larger than all existing keys
+					else if(index + 1 == keyCount){
+						//set index to be inserted into to be after all existing keys
+						index++;
+						//insert key into space after all keys
+						insertKey(key, value, index);
+						break;
+					}	
 				}
 			}
 		}
 
 		//update keyCount variable after insert
 		keyCount = this.getKeyCount();
-
 		//if this leaf is now full after insert split it
-		if(keyCount == m){
-			BPTreeInnerNode<TKey, TValue> splitNode = leafNodeSplit(this);
-			return splitNode;
-		}
+		if(keyCount == m) return leafNodeSplit(this);
+		else return this;
+	}
 
-		return this;
+	/**
+	 * Recieves a key, value and index.
+	 * Inserts key value pair into specified index.
+	 */
+	private void insertKey(TKey key, TValue value, int index){
+		this.setKey(index, key);
+		this.setValue(index, value);
+		this.keyTally++;
 	}
 
 	/**
@@ -107,8 +101,8 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 	 */
 	private BPTreeInnerNode<TKey, TValue> leafNodeSplit(BPTreeLeafNode<TKey, TValue> leaf){
 		//create new nodes that will be used to split old leaf node
-		BPTreeLeafNode<TKey, TValue> leftLeaf = new BPTreeLeafNode<TKey, TValue>(leaf.m);
 		BPTreeLeafNode<TKey, TValue> rightLeaf= new BPTreeLeafNode<TKey, TValue>(leaf.m);
+		BPTreeLeafNode<TKey, TValue> leftLeaf = new BPTreeLeafNode<TKey, TValue>(leaf.m);
 		BPTreeInnerNode<TKey, TValue> newParent = new BPTreeInnerNode<TKey, TValue>(leaf.m);
 
 		//some variables that are used
@@ -135,37 +129,18 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 
 		//copy first half of keys from old leaf node to new left leaf node
 		for(int index = 0; index < midKey; index++){
-			leftLeaf.setKey(index, leaf.getKey(index));
-			leftLeaf.setValue(index, leaf.getValue(index));
-			leftLeaf.keyTally++;
+			leftLeaf.insertKey(leaf.getKey(index), leaf.getValue(index), index);
 		}
 
 		//copy second half(including key sent to parent) of keys from old leaf node to new right leaf node
 		for(int index = midKey; index < keyCount; index++){
-			rightLeaf.setValue(rightLeaf.getKeyCount(), leaf.getValue(index));
-			rightLeaf.setKey(rightLeaf.getKeyCount(), leaf.getKey(index));
-			rightLeaf.keyTally++;
+			rightLeaf.insertKey(leaf.getKey(index), leaf.getValue(index), rightLeaf.getKeyCount());
 		}
 
-		//link the new nodes' pointers to eachother
-		leftLeaf.rightSibling = rightLeaf;
+		//Call relative linkages
+		relinkNodes(leaf, leftLeaf, rightLeaf);
 		leftLeaf.parentNode = newParent;
-		rightLeaf.leftSibling = leftLeaf;
 		rightLeaf.parentNode = newParent;
-
-		//link new nodes to old leaf node references
-		leftLeaf.leftSibling = leaf.leftSibling;
-		if(leftLeaf.leftSibling != null){
-			//link old leaf's sibling to new node
-			leftLeaf.leftSibling.rightSibling = leftLeaf;
-		}
-
-		//link new nodes to old leaf node references
-		rightLeaf.rightSibling = leaf.rightSibling;
-		if(rightLeaf.rightSibling != null){
-			//link old leaf's sibling to new node
-			rightLeaf.rightSibling.leftSibling = rightLeaf;
-		}
 
 		//relink parent references to new leaf nodes
 		if(leaf.parentNode == null){
@@ -181,6 +156,26 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 
 		//return the parent
 		return newParent;
+	}
+
+	private void relinkNodes(BPTreeLeafNode<TKey, TValue> oldLeaf, BPTreeLeafNode<TKey, TValue> leftLeaf, BPTreeLeafNode<TKey, TValue> rightLeaf){
+		//link the nodes' pointers to eachother
+		leftLeaf.rightSibling = rightLeaf;
+		rightLeaf.leftSibling = leftLeaf;
+
+		//link new nodes to old leaf node references
+		leftLeaf.leftSibling = oldLeaf.leftSibling;
+		if(leftLeaf.leftSibling != null){
+			//link old leaf's sibling to new node
+			leftLeaf.leftSibling.rightSibling = leftLeaf;
+		}
+
+		//link new nodes to old leaf node references
+		rightLeaf.rightSibling = oldLeaf.rightSibling;
+		if(rightLeaf.rightSibling != null){
+			//link old leaf's sibling to new node
+			rightLeaf.rightSibling.leftSibling = rightLeaf;
+		}
 	}
 
 	/**
