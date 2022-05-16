@@ -27,40 +27,40 @@ public class Main {
         {
             e.printStackTrace();
         }
-        // try{
-        //     g.printSort(new SelectionSort(), g, true);}
-        // catch(CycleException e)
-        // {
-        //     e.printStackTrace();
-        // }
-        // try{
-        //     g.printSort(new CombSort(), g, true);}
-        // catch(CycleException e)
-        // {
-        //     e.printStackTrace();
-        // }
-        // try{
-        //     g.printSort(new TopologicalSort(), g, true);}
-        // catch(CycleException e)
-        // {
-        //     e.printStackTrace();
-        // }
-        // Graph g2 = new Graph(4);
-        // for(int i=0; i < 4; i++)
-        // {
-        //     g2.addVertex(Integer.toString(i), 1);
-        // }
-        // for(int i=0; i < 3; i++)
-        // {
-        //     g2.addEdge(Integer.toString(i), Integer.toString(i+1), 0, Integer.toString(i) + Integer.toString(i+1));
-        // }
-        // g2.addEdge("3", "0", 0, "30");
-        // try{
-        //     g.printSort(new TopologicalSort(), g2, true);}
-        // catch(CycleException e)
-        // {
-        //     System.out.println(e.message);
-        // }
+        try{
+            g.printSort(new SelectionSort(), g, true);}
+        catch(CycleException e)
+        {
+            e.printStackTrace();
+        }
+        try{
+            g.printSort(new CombSort(), g, true);}
+        catch(CycleException e)
+        {
+            e.printStackTrace();
+        }
+        try{
+            g.printSort(new TopologicalSort(), g, true);}
+        catch(CycleException e)
+        {
+            e.printStackTrace();
+        }
+        Graph g2 = new Graph(4);
+        for(int i=0; i < 4; i++)
+        {
+            g2.addVertex(Integer.toString(i), 1);
+        }
+        for(int i=0; i < 3; i++)
+        {
+            g2.addEdge(Integer.toString(i), Integer.toString(i+1), 0, Integer.toString(i) + Integer.toString(i+1));
+        }
+        g2.addEdge("3", "0", 0, "30");
+        try{
+            g.printSort(new TopologicalSort(), g2, true);}
+        catch(CycleException e)
+        {
+            System.out.println(e.message);
+        }
     }
 }
 
