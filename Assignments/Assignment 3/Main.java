@@ -27,6 +27,8 @@ public class Main {
 	else
 		System.out.println("Key not found!");
 
+	tree.delete(50);
+
 	/*
 	Integer value = 70; // Delete leaf also internal
 	tree.delete(value);
