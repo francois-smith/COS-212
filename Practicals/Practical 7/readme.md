@@ -1,0 +1,1 @@
+Practical 7 was skipped due to time constraints.
