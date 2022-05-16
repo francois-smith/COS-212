@@ -85,6 +85,76 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 	}
 
 	/**
+	 * Override of default delete class.
+	 */
+	public BPTreeNode<TKey, TValue> delete(TKey key){
+		//get current key count of node
+		int keyCount = this.getKeyCount();
+
+		//loop through all keys to see if one to be deleted is in here
+		for(int index = 0; index < keyCount; index++){
+			if(this.getKey(index).equals(key)){
+				//move all indexes down to fill empty space(if one was made)
+				for(int moveIndex = index; moveIndex < keyCount; moveIndex++){
+					this.moveKey(this.getKey(moveIndex+1), this.getValue(moveIndex+1), moveIndex);
+				}
+
+				//Lower index cause key was removed
+				this.keyTally--;
+				break;
+			}
+		}
+
+		//return node(with or without delete)
+		return this;
+	}
+
+	//=============================Helper Functions================================//
+
+	protected BPTreeNode<TKey, TValue> mergeRight(){
+		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	}
+
+	protected BPTreeNode<TKey, TValue> mergeLeft(){
+		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	}
+
+	protected BPTreeNode<TKey, TValue> underflow(){
+		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	}
+
+	/**
+	 * Insert Key and Value into passed in index.
+	 */
+	private void moveKey(TKey key, TValue value, int index){
+		this.setKey(index, key);
+		this.setValue(index, value);
+	}
+
+	/**
+	 * Takes in a leaf and links it references to 2 new leaf node being reparented.
+	 */
+	private void relinkNodes(BPTreeLeafNode<TKey, TValue> oldLeaf, BPTreeLeafNode<TKey, TValue> leftLeaf, BPTreeLeafNode<TKey, TValue> rightLeaf){
+		//link the nodes' pointers to eachother
+		leftLeaf.rightSibling = rightLeaf;
+		rightLeaf.leftSibling = leftLeaf;
+
+		//link new nodes to old leaf node references
+		leftLeaf.leftSibling = oldLeaf.leftSibling;
+		if(leftLeaf.leftSibling != null){
+			//link old leaf's sibling to new node
+			leftLeaf.leftSibling.rightSibling = leftLeaf;
+		}
+
+		//link new nodes to old leaf node references
+		rightLeaf.rightSibling = oldLeaf.rightSibling;
+		if(rightLeaf.rightSibling != null){
+			//link old leaf's sibling to new node
+			rightLeaf.rightSibling.leftSibling = rightLeaf;
+		}
+	}
+
+	/**
 	 * Recieves a key, value and index.
 	 * Inserts key value pair into specified index.
 	 */
@@ -157,38 +227,4 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 		//return the parent
 		return newParent;
 	}
-
-	private void relinkNodes(BPTreeLeafNode<TKey, TValue> oldLeaf, BPTreeLeafNode<TKey, TValue> leftLeaf, BPTreeLeafNode<TKey, TValue> rightLeaf){
-		//link the nodes' pointers to eachother
-		leftLeaf.rightSibling = rightLeaf;
-		rightLeaf.leftSibling = leftLeaf;
-
-		//link new nodes to old leaf node references
-		leftLeaf.leftSibling = oldLeaf.leftSibling;
-		if(leftLeaf.leftSibling != null){
-			//link old leaf's sibling to new node
-			leftLeaf.leftSibling.rightSibling = leftLeaf;
-		}
-
-		//link new nodes to old leaf node references
-		rightLeaf.rightSibling = oldLeaf.rightSibling;
-		if(rightLeaf.rightSibling != null){
-			//link old leaf's sibling to new node
-			rightLeaf.rightSibling.leftSibling = rightLeaf;
-		}
-	}
-
-	/**
-	 * Override of default delete class.
-	 */
-	// public BPTreeNode<TKey, TValue> delete(TKey key){
-	// 	for(int i = 0; i < this.getKeyCount(); i++){
-	// 		if(this.getKey(i).equals(key)){
-	// 			for(j = i; j <this )
-	// 		}
-	// 	}
-
-	// 	return this;
-	// }
-	
 }
