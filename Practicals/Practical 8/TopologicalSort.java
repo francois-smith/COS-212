@@ -4,11 +4,14 @@ public class TopologicalSort extends Sorting {
 
     @Override
     public String[] sortAcs(Vertex[] array) throws CycleException {
-
+        String[] returnArray = new String[]{"Dwadwad"};
+        return returnArray;
     }
 
     @Override
     public String[] sortDsc(Vertex[] array) throws CycleException{
+        String[] returnArray = new String[]{"Dwadwad"};
+        return returnArray;
     }
 
 }

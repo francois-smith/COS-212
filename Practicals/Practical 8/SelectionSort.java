@@ -5,11 +5,13 @@ public class SelectionSort extends Sorting {
 
     @Override
     public String[] sortAcs(Vertex[] array) {
-        
+        String[] returnArray = new String[]{"Dwadwad"};
+        return returnArray;
     }
 
     @Override
     public String[] sortDsc(Vertex[] array) {
-        
+        String[] returnArray = new String[]{"Dwadwad"};
+        return returnArray;
     }
 }
