@@ -20,6 +20,13 @@ public class Main {
 	System.out.println("Structure of the constucted tree is: ");
 	tree.print();
 
+	System.out.println("Search the tree for 80: ");
+    	Integer result = (Integer)tree.search(80);
+	if (result != null)
+		System.out.println("Found key with value " + result);
+	else
+		System.out.println("Key not found!");
+
 	/*
 	Integer value = 70; // Delete leaf also internal
 	tree.delete(value);

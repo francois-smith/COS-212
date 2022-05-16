@@ -1,5 +1,3 @@
-import javax.naming.PartialResultException;
-
 public class ThreadedAvlTree<T extends Comparable<T>> {
     public Node<T> root;
 
@@ -29,8 +27,8 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         Node<T> cur = getLeftMost(node);
 
         while (cur != null) {
-            //System.out.print(" " + cur.data + " ");
-            System.out.println("Node: "+cur.data + " has a height of: " + cur.height + " and a balance of: " + getBalanceFactor(cur) + "\n");
+            System.out.print(" " + cur.data + " ");
+
 
             if (cur.rightThread == true)
                 cur = cur.right;
@@ -41,23 +39,23 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
 
     /* Do not edit the code above */
 
+
     void convertAVLtoThreaded(Node<T> node) {
         if(node == null){
             return;
         }
         insert(node, node.data);
-        if(node.left != null){
-            convertAVLtoThreaded(node.left);
-        } 
-        if(node.right != null){
-            convertAVLtoThreaded(node.right);
-        } 
+         
+        if(node.right != null){convertAVLtoThreaded(node.right);}
+        if(node.left != null){convertAVLtoThreaded(node.left);}
     }
 
     /**
      * Insert the given data into the tree.
      * Duplicate data is not allowed. just return the node.
      */
+
+
     Node<T> insert(Node<T> node, T data) {
         if(root == null){
             root = new Node<T>(data);
@@ -111,7 +109,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
                 parent.right = newNode;
             }
 
-            adjustHeights(root);
+            adjustHeights(this.root);
             Node<T> grandparent = null;
             while(parent != null){
                 grandparent = getParent(parent);
@@ -200,10 +198,9 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             }
         }
 
-    
         adjustHeights(this.root);
         return this.root;
-    } 
+    }
 
     private Node<T> deleteWithNoChildren(Node<T> node, Node<T> parent){
         Node<T> nodeRef = node;
@@ -219,6 +216,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             parent.left = null;
         }
 
+        node = null;
         return node;
     }
 
@@ -291,36 +289,79 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         int balanceFactor = getBalanceFactor(node);
 
         if(grandparent == null){
-            if(balanceFactor > 1 && getBalanceFactor(node.right) > 0){
+            if(balanceFactor > 1 && getBalanceFactor(node.right) < 0){
+                node.right = rightRotation(node.right);
                 leftRotation(node);
+                return node;
             }
-    
-            if (balanceFactor < -1 && getBalanceFactor(node.left) < 0){
+
+            if(balanceFactor < -1 && getBalanceFactor(node.left) > 0){
+                node.left = leftRotation(node.left);
                 rightRotation(node);
+                return node;
             }
     
-            return node;
+            if(balanceFactor > 1){
+                leftRotation(node);
+                return node;
+            }
+    
+            if (balanceFactor < -1){
+                rightRotation(node);
+                return node;
+            }
         }
 
         if(balanceFactor > 1 && getBalanceFactor(node.right) <= 0){
             node.right = rightRotation(node.right);
-            grandparent.right = leftRotation(node);
+            Node<T> temp = leftRotation(node);
+            if(temp.data.compareTo(grandparent.data) < 0){
+                grandparent.left = temp;
+            }
+            else{
+                grandparent.right = temp;
+            }
+            adjustHeights(this.root);
+            return node;
         }
 
-        if(balanceFactor > 1 && getBalanceFactor(node.right) > 0){
-            grandparent.left = leftRotation(node);
+        if(balanceFactor > 1 && getBalanceFactor(node.right) >= 0){
+            Node<T> temp = leftRotation(node);
+            if(temp.data.compareTo(grandparent.data) < 0){
+                grandparent.left = temp;
+            }
+            else{
+                grandparent.right = temp;
+            }
+            adjustHeights(this.root);
+            return node;
         }
 
         if(balanceFactor < -1 && getBalanceFactor(node.left) >= 0){
             node.left = leftRotation(node.left);
-            grandparent.left = rightRotation(node);
+            Node<T> temp = rightRotation(node);
+            if(temp.data.compareTo(grandparent.data) < 0){
+                grandparent.left = temp;
+            }
+            else{
+                grandparent.right = temp;
+            }
+            adjustHeights(this.root);
+            return node;
         }
 
-        if (balanceFactor < -1 && getBalanceFactor(node.left) < 0){
-            grandparent.right = rightRotation(node);
+        if (balanceFactor < -1 && getBalanceFactor(node.left) <= 0){
+            Node<T> temp = rightRotation(node);
+            if(temp.data.compareTo(grandparent.data) < 0){
+                grandparent.left = temp;
+            }
+            else{
+                grandparent.right = temp;
+            }
+            adjustHeights(this.root);
+            return node;
         }
 
-        adjustHeights(root);
         return node;
     }
 
@@ -329,7 +370,10 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             return -1;
         }
 
-        int leftHeight = adjustHeights(node.left);
+        int leftHeight = -1;
+        if(node.left != node){
+            leftHeight = adjustHeights(node.left);
+        }
         int rightHeight = -1;
         if(!node.rightThread){
             rightHeight = adjustHeights(node.right);
@@ -356,7 +400,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
         return (value1 > value2) ? value1 : value2;
     }
 
-    Node<T> rightRotation(Node<T> node){
+    private Node<T> rightRotation(Node<T> node){
         Node<T> child = node.left;
         Node<T> grandChild = null;
         if(child.rightThread == false){
@@ -377,21 +421,18 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             node.left = null;
         }
 
-        if(node == root){
+        if(node == this.root){
             this.root = child;
         }
-
-        adjustHeights(root);
 
         return child;
     }
 
-    Node<T> leftRotation(Node<T> node){
+    private Node<T> leftRotation(Node<T> node){
         Node<T> child = node.right;
         Node<T> grandChild = child.left;
 
         child.left = node;
-        child.rightThread = false;
         if(grandChild != null){
             node.right = grandChild;
         }
@@ -403,39 +444,7 @@ public class ThreadedAvlTree<T extends Comparable<T>> {
             this.root = child;
         }
 
-        adjustHeights(root);
         return child;
     }
-
-    public int updateHeight(Node<T> node){
-        int left = 0, right = 0;
-        if(node == null){
-            System.out.println("Null node!");
-            return 0; 
-        }
-        if(node.left == null && node.right == null){//rightmost leaf node 
-            node.height = 0;
-            System.out.println("Leaf node: "+ node.data+ " height: "+ node.height);
-            return 0;
-        }
-        if(node.left != null){
-            System.out.println("Go left from: "+ node.data);
-            left = 1 + updateHeight(node.left);//calc height of left subtree
-        }
-        if(node.rightThread){//right threaded node, don't follow thread
-            node.height = 0;
-            System.out.println("Right Thread leaf node reached! Node: "+ node.data + " Right thread to: "+ node.right.data);
-            return 0;
-        }
-        if(node.right != null && !node.rightThread){
-            System.out.println("Go right from: "+ node.data);
-            right = 1 + updateHeight(node.right); //calc height of right subtree
-        }
-        //set height of node to be height of longest subtree
-        if(left > right) node.height = left;
-        else node.height = right;
-        System.out.println("Node: "+ node.data+ " height: "+ node.height);
-        //return the height for recursion
-        return node.height;
-    }
 }
+
