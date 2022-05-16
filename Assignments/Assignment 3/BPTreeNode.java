@@ -116,43 +116,6 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 		
         //Otherwise return null
         return null;
-
-		//====================Traversal Approach =====================
-		// //variables needed
-		// int keyCount = 0;
-		// Boolean isLeaf = false;
-
-		// //only runs if root is a leaf node
-		// if(this.isLeaf()){
-		// 	keyCount = this.getKeyCount();
-		// 	for(int index = 0; index < keyCount; index++){
-		// 		if(this.getKey(index).equals(key)){
-		// 			TValue returnValue = ((BPTreeLeafNode<TKey, TValue>) this).getValue(index);
-		// 			return returnValue;
-		// 		} 
-		// 	}
-
-		// 	//if key was not found in the root
-		// 	return null;
-		// }
-
-		// //variable to loop down in tree
-		// BPTreeInnerNode<TKey, TValue> nodePtr = (BPTreeInnerNode<TKey, TValue>) this;
-
-		// //loop until leftmost leaf is found
-		// while(!isLeaf){
-		// 	//if the child is an inner node then move down to child node and run again
-		// 	if(!nodePtr.getChild(0).isLeaf()){
-		// 		nodePtr = (BPTreeInnerNode<TKey, TValue>) nodePtr.getChild(0);
-		// 	}
-		// 	else{
-		// 		isLeaf = true;
-		// 	}
-		// }
-
-		// //When traverse a the leaf node level to look for value
-		// //Returns value or null
-		// return leafTraverse((BPTreeLeafNode<TKey, TValue>)nodePtr.getChild(0), key);
 	}
 
 	/**
@@ -180,8 +143,22 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 		return null;
 	}
 
-
 	//=============================Helper Functions================================//
+
+	/**
+	 * Abstract class to be overwritten in child classes.
+	 */
+	abstract protected BPTreeNode<TKey, TValue> mergeLeft();
+
+	/**
+	 * Abstract class to be overwritten in child classes.
+	 */
+	abstract protected BPTreeNode<TKey, TValue> mergeRight();
+
+	/**
+	 * Abstract class to be overwritten in child classes.
+	 */
+	abstract protected BPTreeNode<TKey, TValue> underflow();
 
 	/**
 	 * Traverses tree one on leaf level from specified node.
@@ -203,5 +180,28 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 			nodePtr = (BPTreeLeafNode<TKey, TValue>)nodePtr.rightSibling;
 		}
 		return null;
+	}
+
+	/**
+	 * Search a key on the B+ tree and return its associated node.
+	 */
+	public BPTreeNode<TKey, TValue> searchNode(TKey key) {
+		int index = 0;
+        while (index < getKeyCount() && key.compareTo(getKey(index)) >= 0){
+			index++;
+		}
+
+		//If this is not a leaf then traverse down
+        if(!this.isLeaf()){
+			return ((BPTreeInnerNode<TKey, TValue>) this).getChild(index).searchNode(key);
+		}
+
+        //If this is a leaf and the value found is correct then return it
+        if(getKey(index-1).equals(key)){
+			return ((BPTreeLeafNode<TKey, TValue>) this);
+		}
+		
+        //Otherwise return null
+        return null;
 	}
 }
