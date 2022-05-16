@@ -89,6 +89,106 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 	}
 
 	/**
+	 * Override of default delete class.
+	 */
+	public BPTreeNode<TKey, TValue> delete(TKey key){
+		//search tree for key
+		BPTreeLeafNode<TKey, TValue> deleteNode = (BPTreeLeafNode<TKey, TValue>)searchNode(key);
+
+		//if key was not found in tree then it can't be deleted
+		if(deleteNode == null){
+			return this;
+		}
+
+		//delete the key
+		deleteNode.delete(key);
+
+		//Check of node underflows after delete
+		int minOrder = m/2-1 ;
+		if(deleteNode.getKeyCount() < minOrder){
+			return underflow(deleteNode);
+		}
+		else{
+			return this;
+		}
+	}
+
+	//=============================Helper Functions================================//
+	
+	protected BPTreeNode<TKey, TValue> underflow(BPTreeLeafNode<TKey, TValue> deleteNode){
+		BPTreeLeafNode<TKey, TValue> leftNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
+		BPTreeLeafNode<TKey, TValue> rightNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.rightSibling;
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
+
+		int siblingKeyCount = 0;
+		int minOrder = m/2-1;
+		int keyCount = deleteNode.getKeyCount();
+
+		BPTreeLeafNode<TKey, TValue> leftSibling = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
+		if(leftSibling != null){
+			siblingKeyCount= leftSibling.getKeyCount();
+			if(siblingKeyCount > minOrder){
+				//Move 
+				for(int index = keyCount; index > 0; index++){
+
+				}
+				return this;
+			}
+			
+		}
+
+		return this;
+	}
+
+	protected BPTreeNode<TKey, TValue> mergeRight(){
+		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	}
+
+	protected BPTreeNode<TKey, TValue> mergeLeft(){
+		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	}
+
+	/**
+	 * Called from child class.
+	 * Send key to add.
+	 * Send back index key was added to update references within child.
+	 */
+	public int addChildKey(TKey key){
+		//get current key count of node
+		int keyCount = this.getKeyCount();
+
+		for(int index = 0; index < keyCount; index++){
+			//check if current index is greater than key to be inserted
+			if(this.getKey(index).compareTo(key) > 0){
+				//move up all values to make space for new key
+				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
+					this.setKey(moveIndex, this.getKey(moveIndex-1));
+				}
+
+				//move up all references to make space for new reference
+				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
+					this.setChild(moveIndex, this.getChild(moveIndex-1));
+				}
+
+				this.setKey(index, key);
+				this.keyTally++;
+				return index;
+			}
+
+			//if key to be inserted is larger than all existing keys
+			if(index+1 == keyCount){
+				//set index to be inserted into, to be after all existing values
+				index++;
+				this.setKey(index, key);
+				this.keyTally++;
+				return index;
+			}
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Called from insert when position was found where node should be inserted.
 	 * Specify leaf to be inserted into with key and value.
 	 */
@@ -177,45 +277,5 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 			newParent = innerNodeSplit(newParent);
 		}
 		return newParent;
-	}
-
-	/**
-	 * Called from child class.
-	 * Send key to add.
-	 * Send back index key was added to update references within child.
-	 */
-	public int addChildKey(TKey key){
-		//get current key count of node
-		int keyCount = this.getKeyCount();
-
-		for(int index = 0; index < keyCount; index++){
-			//check if current index is greater than key to be inserted
-			if(this.getKey(index).compareTo(key) > 0){
-				//move up all values to make space for new key
-				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
-					this.setKey(moveIndex, this.getKey(moveIndex-1));
-				}
-
-				//move up all references to make space for new reference
-				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
-					this.setChild(moveIndex, this.getChild(moveIndex-1));
-				}
-
-				this.setKey(index, key);
-				this.keyTally++;
-				return index;
-			}
-
-			//if key to be inserted is larger than all existing keys
-			if(index+1 == keyCount){
-				//set index to be inserted into, to be after all existing values
-				index++;
-				this.setKey(index, key);
-				this.keyTally++;
-				return index;
-			}
-		}
-
-		return 0;
 	}
 }
