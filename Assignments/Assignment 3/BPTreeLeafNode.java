@@ -111,22 +111,10 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 
 	//=============================Helper Functions================================//
 
-	protected BPTreeNode<TKey, TValue> mergeRight(){
-		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
-	}
-
-	protected BPTreeNode<TKey, TValue> mergeLeft(){
-		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
-	}
-
-	protected BPTreeNode<TKey, TValue> underflow(){
-		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
-	}
-
 	/**
 	 * Insert Key and Value into passed in index.
 	 */
-	private void moveKey(TKey key, TValue value, int index){
+	public void moveKey(TKey key, TValue value, int index){
 		this.setKey(index, key);
 		this.setValue(index, value);
 	}
@@ -158,7 +146,7 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 	 * Recieves a key, value and index.
 	 * Inserts key value pair into specified index.
 	 */
-	private void insertKey(TKey key, TValue value, int index){
+	public void insertKey(TKey key, TValue value, int index){
 		this.setKey(index, key);
 		this.setValue(index, value);
 		this.keyTally++;
