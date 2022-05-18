@@ -106,7 +106,7 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 		//Check of node underflows after delete
 		int minOrder = m/2-1 ;
 		if(deleteNode.getKeyCount() < minOrder){
-			return underflow(deleteNode);
+			return underflow(deleteNode, key);
 		}
 		else{
 			return this;
@@ -115,37 +115,140 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 
 	//=============================Helper Functions================================//
 	
-	protected BPTreeNode<TKey, TValue> underflow(BPTreeLeafNode<TKey, TValue> deleteNode){
-		BPTreeLeafNode<TKey, TValue> leftNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
-		BPTreeLeafNode<TKey, TValue> rightNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.rightSibling;
+	protected BPTreeNode<TKey, TValue> underflow(BPTreeLeafNode<TKey, TValue> deleteNode, TKey deleteKey){
+		//Variables needed
 		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
-
 		int siblingKeyCount = 0;
 		int minOrder = m/2-1;
 		int keyCount = deleteNode.getKeyCount();
 
+		//See if left sibling has enough keys to share
 		BPTreeLeafNode<TKey, TValue> leftSibling = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
 		if(leftSibling != null){
+			//If left sibling exists check if it has enough keys to share
 			siblingKeyCount= leftSibling.getKeyCount();
-			if(siblingKeyCount > minOrder){
-				//Move 
-				for(int index = keyCount; index > 0; index++){
 
+			//if it has enough
+			if(siblingKeyCount > minOrder){
+				System.out.println("Share Left");
+				//Move all keys one index up
+				for(int index = keyCount; index > 0; index--){
+					deleteNode.moveKey(deleteNode.getKey(index-1), deleteNode.getValue(index-1), index);
 				}
+
+				//Copy key from left sibling
+				deleteNode.insertKey(leftSibling.getKey(siblingKeyCount-1), leftSibling.getValue(siblingKeyCount-1), 0);
+
+				//Replace parent key if key deleted was saved in parent
+				for(int parentIndex = 0; parentIndex < parentNode.getKeyCount(); parentIndex++){
+					if(parentNode.getKey(parentIndex).equals(deleteKey)){
+						parentNode.setKey(parentIndex, deleteNode.getKey(0));
+						break;
+					}
+				}
+
+				//Remove key reference from sibling
+				leftSibling.keyTally--;
 				return this;
 			}
 			
 		}
 
+		//If not see if right sibling has enough keys to share
+		BPTreeLeafNode<TKey, TValue> rightSibling = (BPTreeLeafNode<TKey, TValue>)deleteNode.rightSibling;
+		if(rightSibling != null){
+			//If right sibling exists check if it has enough keys to share
+			siblingKeyCount = rightSibling.getKeyCount();
+
+			//if it has enough
+			if(siblingKeyCount > minOrder){
+				System.out.println("Share Right");
+				deleteNode.printKeys();
+				//Copy first key from right sibling
+				deleteNode.insertKey(rightSibling.getKey(0), rightSibling.getValue(0), keyCount);
+
+
+				//Move all keys and value down one index to fill gap
+				for(int moveIndex = 0; moveIndex <= keyCount; moveIndex++){
+					rightSibling.moveKey(rightSibling.getKey(moveIndex+1), rightSibling.getValue(moveIndex+1), moveIndex);
+				}
+				rightSibling.keyTally--;
+
+				//Replace parent key if key deleted was saved in parent
+				for(int parentIndex = 0; parentIndex <= parentNode.getKeyCount(); parentIndex++){
+					if(parentNode.getKey(parentIndex).equals(deleteKey)){
+						parentNode.setKey(parentIndex+1, rightSibling.getKey(0));
+						break;
+					}
+				}
+
+				return this;
+			}
+		}
+
+		if(leftSibling != null){
+			mergeLeft(deleteNode, deleteKey);
+		}
+		else if(rightSibling != null){
+			mergeRight(deleteNode, deleteKey);
+		}
+
 		return this;
 	}
 
-	protected BPTreeNode<TKey, TValue> mergeRight(){
-		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	protected BPTreeNode<TKey, TValue> mergeLeft(BPTreeLeafNode<TKey, TValue> deleteNode, TKey deleteKey){
+		System.out.println("Merge Left");
+		BPTreeLeafNode<TKey, TValue> leftNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
+		
+		int keyCount = deleteNode.getKeyCount();
+		for(int index = 0; index < keyCount; index++){
+			leftNode.insertKey(deleteNode.getKey(index), deleteNode.getValue(index), leftNode.getKeyCount());
+		}
+		
+		int parentKeyCount = parentNode.getKeyCount();
+		for(int parentIndex = 0; parentIndex < parentKeyCount; parentIndex++){
+			if(parentNode.getKey(parentIndex).equals(deleteKey)){
+				for(int i = parentIndex; i < parentKeyCount; i++){
+					parentNode.setKey(i, parentNode.getKey(i+1));
+					parentNode.setChild(i, parentNode.getChild(i+1));
+				}
+				parentNode.keyTally--;
+				break;
+			}
+		}
+
+		return parentNode;
 	}
 
-	protected BPTreeNode<TKey, TValue> mergeLeft(){
-		return this; //Abstract helper function in BPTreeNode, will never be executed in leaf(just return)
+	protected BPTreeNode<TKey, TValue> mergeRight(BPTreeLeafNode<TKey, TValue> deleteNode, TKey deleteKey){
+		System.out.println("Merge Right");
+		BPTreeLeafNode<TKey, TValue> rightNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.rightSibling;
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
+		
+		//Move all value to make space
+		int keyCount = deleteNode.getKeyCount();
+		for(int index = 0; index < keyCount; index++){
+			rightNode.moveKey(rightNode.getKey(index), rightNode.getValue(index), keyCount+index);
+		}
+
+		for(int index = 0; index <keyCount; index++){
+			rightNode.insertKey(deleteNode.getKey(index), deleteNode.getValue(index), index);
+		}
+		
+		int parentKeyCount = parentNode.getKeyCount();
+		for(int parentIndex = 0; parentIndex < parentKeyCount; parentIndex++){
+			if(parentNode.getKey(parentIndex).equals(deleteKey)){
+				for(int i = parentIndex; i < parentKeyCount; i++){
+					parentNode.setKey(i, parentNode.getKey(i+1));
+					parentNode.setChild(i, parentNode.getChild(i+1));
+				}
+				parentNode.keyTally--;
+				break;
+			}
+		}
+
+		return parentNode;
 	}
 
 	/**
