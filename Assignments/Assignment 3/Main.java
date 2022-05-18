@@ -5,7 +5,6 @@ public class Main {
     {
 	//General tree
 	BPTree<Integer, Integer> tree = new BPTree<Integer, Integer>(4); // A B+ Tree with order 4
-
 	
 	tree.insert(20, 5000);
 	tree.insert(10, 1000);
@@ -19,17 +18,7 @@ public class Main {
 
 	System.out.println("Structure of the constucted tree is: ");
 	tree.print();
-
-	System.out.println("Search the tree for 80: ");
-    	Integer result = (Integer)tree.search(80);
-	if (result != null)
-		System.out.println("Found key with value " + result);
-	else
-		System.out.println("Key not found!");
-
-	tree.delete(50);
-
-	/*
+ /*
 	Integer value = 70; // Delete leaf also internal
 	tree.delete(value);
 	System.out.println("Structure of the tree after delete of: " + value);
@@ -123,7 +112,7 @@ public class Main {
 	} else
 		System.out.println("Index empty!");
 
-	Expected Output:
+	/* Expected Output:
 	Structure of the constucted tree is:
 	Level 1 [ 30 50 70]
 	Level 2 [ 10 20]
