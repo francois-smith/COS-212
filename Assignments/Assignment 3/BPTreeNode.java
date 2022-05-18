@@ -99,23 +99,28 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 * Search a key on the B+ tree and return its associated value using the index set. If the given key is not found, null should be returned.
 	 */
 	public TValue search(TKey key) {
+		BPTreeNode<TKey, TValue> searchPtr = this;
+
+		int keyCount = searchPtr.getKeyCount();
 		int index = 0;
-        while (index < getKeyCount() && key.compareTo(getKey(index)) >= 0){
-			index++;
+		while(!searchPtr.isLeaf()){
+			keyCount = searchPtr.getKeyCount();
+			for(index = 0; index < keyCount; index++){
+				if(key.compareTo(searchPtr.getKey(index)) < 0){
+					break;
+				}
+			}
+			
+			searchPtr = ((BPTreeInnerNode<TKey, TValue>)searchPtr).getChild(index);
 		}
 
-		//If this is not a leaf then traverse down
-        if(!this.isLeaf()){
-			return ((BPTreeInnerNode<TKey, TValue>) this).getChild(index).search(key);
-		}
+		for(index = 0; index < searchPtr.getKeyCount(); index++){
+			if(searchPtr.getKey(index).equals(key)){
+				return ((BPTreeLeafNode<TKey, TValue>)searchPtr).getValue(index);
+			}
+		}	
 
-        //If this is a leaf and the value found is correct then return it
-        if(getKey(index-1).equals(key)){
-			return ((BPTreeLeafNode<TKey, TValue>) this).getValue(index-1);
-		}
-		
-        //Otherwise return null
-        return null;
+		return null;
 	}
 
 	/**
@@ -140,68 +145,97 @@ abstract class BPTreeNode<TKey extends Comparable<TKey>, TValue> {
 	 */
 	@SuppressWarnings("unchecked")
 	public TValue[] values(){
-		return null;
+		//variables needed
+		int keyCount = 0;
+		Boolean isLeaf = false;
+
+		//only runs if root is a leaf node
+		if(this.isLeaf()){
+			keyCount = this.getKeyCount();
+			Object[] returnArray = new Object[keyCount];
+			for(int index = 0; index < keyCount; index++){
+				returnArray[index] = ((BPTreeLeafNode<TKey, TValue>)this).getValue(index);
+			}
+
+			return (TValue[])returnArray;
+		}
+
+		//variable to loop down in tree
+		BPTreeInnerNode<TKey, TValue> nodePtr = (BPTreeInnerNode<TKey, TValue>) this;
+
+		//loop until leftmost leaf is found
+		while(!isLeaf){
+			//if the child is an inner node then move down to child node and run again
+			if(!nodePtr.getChild(0).isLeaf()){
+				nodePtr = (BPTreeInnerNode<TKey, TValue>) nodePtr.getChild(0);
+			}
+			else{
+				isLeaf = true;
+			}
+		}
+
+		//When traverse a the leaf node level to get values
+		return leafTraverse((BPTreeLeafNode<TKey, TValue>)nodePtr.getChild(0));
 	}
 
 	//=============================Helper Functions================================//
-
-	/**
-	 * Abstract class to be overwritten in child classes.
-	 */
-	abstract protected BPTreeNode<TKey, TValue> mergeLeft();
-
-	/**
-	 * Abstract class to be overwritten in child classes.
-	 */
-	abstract protected BPTreeNode<TKey, TValue> mergeRight();
-
-	/**
-	 * Abstract class to be overwritten in child classes.
-	 */
-	abstract protected BPTreeNode<TKey, TValue> underflow();
 
 	/**
 	 * Traverses tree one on leaf level from specified node.
 	 * If key is found return value otherwise null.
 	 * Tree always gets traversed from left to right.
 	 */
-	public TValue leafTraverse(BPTreeLeafNode<TKey, TValue> startingNode, TKey key){
-		int keyCount = 0;
-
+	@SuppressWarnings("unchecked")
+	public TValue[] leafTraverse(BPTreeLeafNode<TKey, TValue> startingNode){
 		BPTreeLeafNode<TKey, TValue> nodePtr = startingNode;
+
+		int keyCount = 0;
+		Object[] returnArray = new Object[keyCount];
 		while(nodePtr != null){
+			Object[] tempArray = new Object[returnArray.length+nodePtr.getKeyCount()];
+			int end = 0; 
+			for(end = 0; end < returnArray.length; end++){
+				tempArray[end] = returnArray[end];
+			}
+
 			keyCount = nodePtr.getKeyCount();
 			for(int index = 0; index < keyCount; index++){
-				if(nodePtr.getKey(index).equals(key)){
-					TValue returnValue = nodePtr.getValue(index);
-					return returnValue;
-				}
+				tempArray[end] = nodePtr.getValue(index);
+				end++;
 			}
+
+			returnArray = tempArray;
 			nodePtr = (BPTreeLeafNode<TKey, TValue>)nodePtr.rightSibling;
 		}
-		return null;
+		return (TValue[])returnArray;
 	}
 
 	/**
 	 * Search a key on the B+ tree and return its associated node.
 	 */
 	public BPTreeNode<TKey, TValue> searchNode(TKey key) {
+		BPTreeNode<TKey, TValue> searchPtr = this;
+
+		int keyCount = searchPtr.getKeyCount();
 		int index = 0;
-        while (index < getKeyCount() && key.compareTo(getKey(index)) >= 0){
-			index++;
+		while(!searchPtr.isLeaf()){
+			keyCount = searchPtr.getKeyCount();
+			for(index = 0; index < keyCount; index++){
+				if(key.compareTo(searchPtr.getKey(index)) < 0){
+					break;
+				}
+			}
+			
+			searchPtr = ((BPTreeInnerNode<TKey, TValue>)searchPtr).getChild(index);
 		}
 
-		//If this is not a leaf then traverse down
-        if(!this.isLeaf()){
-			return ((BPTreeInnerNode<TKey, TValue>) this).getChild(index).searchNode(key);
-		}
+		for(index = 0; index < searchPtr.getKeyCount(); index++){
+			if(searchPtr.getKey(index).equals(key)){
+				
+				return searchPtr;
+			}
+		}	
 
-        //If this is a leaf and the value found is correct then return it
-        if(getKey(index-1).equals(key)){
-			return ((BPTreeLeafNode<TKey, TValue>) this);
-		}
-		
-        //Otherwise return null
-        return null;
+		return null;
 	}
 }
