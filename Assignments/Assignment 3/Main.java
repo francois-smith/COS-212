@@ -6,15 +6,29 @@ public class Main {
 	//General tree
 	BPTree<Integer, Integer> tree = new BPTree<Integer, Integer>(4); // A B+ Tree with order 4
 	
-	tree.insert(20, 5000);
-	tree.insert(10, 1000);
-	tree.insert(30, 9000);
-	tree.insert(50, 8000);
-	tree.insert(40, 2000);
-	tree.insert(60, 7000);
-	tree.insert(90, 3000);
-	tree.insert(70, 6000);
-	tree.insert(80, 4000);
+	tree.insert(200, 1);
+	tree.insert(10, 1);
+	tree.insert(68, 1);
+	tree.insert(14, 1);
+	tree.insert(22, 1);
+	tree.insert(55, 1);
+	tree.insert(66, 1);
+	tree.insert(77, 1);
+	tree.insert(99, 1);
+	tree.insert(69, 1);
+	tree.insert(23, 1);
+
+
+
+	
+
+	// tree.delete(120);
+	// tree.delete(200);
+	// tree.delete(10);
+	// tree.delete(68);
+	// tree.delete(14);
+
+	
 
 	System.out.println("Structure of the constucted tree is: ");
 	tree.print();
@@ -62,10 +76,10 @@ public class Main {
 
 	// DB student table indexes
 	BPTree<Integer, Integer> pktree = new BPTree<Integer, Integer>(4); // A B+ Tree with order 4
-	pktree.insert(16230943, 1);
-	pktree.insert(17248830, 2);
-	pktree.insert(16094340, 3);
-	pktree.insert(17012340, 4);
+	pktree.delete(16230943);
+	pktree.delete(17248830, 2);
+	pktree.delete(16094340, 3);
+	pktree.delete(17012340, 4);
 	
 	System.out.println();
 	System.out.println("Structure of the constucted index is: ");
@@ -88,10 +102,10 @@ public class Main {
 		System.out.println("Index empty!");
 
 	BPTree<String, Integer> sktree = new BPTree<String, Integer>(4); // A B+ Tree with order 4
-	sktree.insert("Molefe", 1);
-	sktree.insert("Muller", 2);
-	sktree.insert("Botha", 3);
-	sktree.insert("Evans", 4);
+	sktree.delete("Molefe");
+	sktree.delete("Muller", 2);
+	sktree.delete("Botha", 3);
+	sktree.delete("Evans", 4);
 	System.out.println();
 	System.out.println("Structure of the constucted index is: ");
 	sktree.print();

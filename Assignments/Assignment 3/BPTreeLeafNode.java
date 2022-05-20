@@ -90,6 +90,7 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 	public BPTreeNode<TKey, TValue> delete(TKey key){
 		//get current key count of node
 		int keyCount = this.getKeyCount();
+		int minOrder = m/2-1;
 
 		//loop through all keys to see if one to be deleted is in here
 		for(int index = 0; index < keyCount; index++){
@@ -98,9 +99,10 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 				for(int moveIndex = index; moveIndex < keyCount; moveIndex++){
 					this.moveKey(this.getKey(moveIndex+1), this.getValue(moveIndex+1), moveIndex);
 				}
-
-				//Lower index cause key was removed
 				this.keyTally--;
+				if(this.parentNode != null && this.getKeyCount() < minOrder){
+					return this.underflow(key);
+				}
 				break;
 			}
 		}
@@ -110,6 +112,106 @@ class BPTreeLeafNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<T
 	}
 
 	//=============================Helper Functions================================//
+
+	protected BPTreeNode<TKey, TValue> underflow(TKey deleteKey){
+		//Variables needed
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)this.parentNode;
+		int siblingKeyCount = 0;
+		int minOrder = m/2-1;
+		int keyCount = this.getKeyCount();
+
+		//See if left sibling has enough keys to share
+		BPTreeLeafNode<TKey, TValue> leftSibling = (BPTreeLeafNode<TKey, TValue>)this.leftSibling;
+		if(leftSibling != null){
+			//If left sibling exists check if it has enough keys to share
+			siblingKeyCount= leftSibling.getKeyCount();
+			//if it has enough
+			if(siblingKeyCount > minOrder && leftSibling.parentNode == this.parentNode){
+				
+				//Move all keys one index up
+				for(int index = keyCount; index > 0; index--){
+					this.moveKey(this.getKey(index-1), this.getValue(index-1), index);
+				}
+
+				//Copy key from left sibling
+				this.insertKey(leftSibling.getKey(siblingKeyCount-1), leftSibling.getValue(siblingKeyCount-1), 0);
+
+				//Replace parent key if key deleted was saved in parent
+				for(int parentIndex = 0; parentIndex < parentNode.getKeyCount(); parentIndex++){
+					if(parentNode.getKey(parentIndex).equals(deleteKey)){
+						parentNode.setKey(parentIndex, this.getKey(0));
+						break;
+					}
+				}
+
+				//Remove key reference from sibling
+				leftSibling.keyTally--;
+				return this;
+			}
+			
+		}
+
+		//If not see if right sibling has enough keys to share
+		BPTreeLeafNode<TKey, TValue> rightSibling = (BPTreeLeafNode<TKey, TValue>)this.rightSibling;
+		if(rightSibling != null && rightSibling.parentNode == this.parentNode){
+			//If right sibling exists check if it has enough keys to share
+			siblingKeyCount = rightSibling.getKeyCount();
+
+			//if it has enough
+			if(siblingKeyCount > minOrder){
+				//Copy first key from right sibling
+				this.insertKey(rightSibling.getKey(0), rightSibling.getValue(0), keyCount);
+
+				//Move all keys and value down one index to fill gap
+				for(int moveIndex = 0; moveIndex < keyCount; moveIndex++){
+					rightSibling.moveKey(rightSibling.getKey(moveIndex+1), rightSibling.getValue(moveIndex+1), moveIndex);
+				}
+				rightSibling.keyTally--;
+
+				//Replace parent key if key deleted was saved in parent
+				for(int parentIndex = 0; parentIndex < parentNode.getKeyCount(); parentIndex++){
+					if(parentNode.getKey(parentIndex).equals(deleteKey)){
+						parentNode.setKey(parentIndex+1, rightSibling.getKey(0));
+						break;
+					}
+				}
+
+				return this;
+			}
+		}
+
+		if(leftSibling != null){
+			return mergeLeft(deleteKey);
+		}
+		else{
+			return mergeRight(deleteKey);
+		}
+	}
+
+	protected BPTreeNode<TKey, TValue> mergeLeft(TKey deleteKey){
+		((BPTreeLeafNode<TKey, TValue>)this.leftSibling).merge(this);
+		BPTreeNode<TKey, TValue> returnNode = this.leftSibling;
+		BPTreeInnerNode<TKey, TValue> parent = (BPTreeInnerNode<TKey, TValue>)this.parentNode;
+		int parentPostion = parent.getPosition(this);
+		parent.deleteIndex(parentPostion-1, 1);
+		return returnNode;
+	}
+
+	protected BPTreeNode<TKey, TValue> mergeRight(TKey deleteKey){
+		((BPTreeLeafNode<TKey, TValue>)this).merge((BPTreeLeafNode<TKey, TValue>)this.rightSibling);
+		BPTreeNode<TKey, TValue> returnNode = this;
+		BPTreeInnerNode<TKey, TValue> parent = (BPTreeInnerNode<TKey, TValue>)this.parentNode;
+		int parentPostion = parent.getPosition(this);
+		parent.deleteIndex(parentPostion, 1);
+		return returnNode;
+	}
+
+	protected void merge(BPTreeLeafNode<TKey, TValue> consumeNode){
+		for (int index = 0; index < consumeNode.getKeyCount(); index++) {
+			insertKey(consumeNode.getKey(index), consumeNode.getValue(index), getKeyCount());
+		}
+		this.rightSibling = consumeNode.rightSibling;
+	}
 
 	/**
 	 * Insert Key and Value into passed in index.

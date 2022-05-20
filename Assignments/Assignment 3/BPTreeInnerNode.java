@@ -42,27 +42,25 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 	 */
 	public BPTreeNode<TKey, TValue> insert(TKey key, TValue value){
 		//node that will search indexes for leaf to insert into
-		BPTreeInnerNode<TKey, TValue> nodePtr = (BPTreeInnerNode<TKey, TValue>)this;
-
-		//Variables
-		Boolean isLeaf = false;
+		BPTreeNode<TKey, TValue> nodePtr = this;
 		int insertPosition = 0;
 
 		//loop until leaf is found
-		while(!isLeaf){
+		while(!nodePtr.isLeaf()){
 			//loop through all keys of node
 			for(int index = 0; index < nodePtr.getKeyCount(); index++){
+				//System.out.println(nodePtr.getKey(index));
 				//if the key to insert is less than current key
 				if(key.compareTo(nodePtr.getKey(index)) < 0){
 					//if current node's child is a leaf then exit loop
-					if(nodePtr.getChild(index).isLeaf()){
+					if(((BPTreeInnerNode<TKey, TValue>)nodePtr).getChild(index).isLeaf()){
 						insertPosition = index;
-						isLeaf = true;
+						nodePtr = ((BPTreeInnerNode<TKey, TValue>)nodePtr).getChild(index);
 						break;
 					}
 					//else if the child is an inner nodes then move down to child node and run again
 					else{
-						nodePtr = (BPTreeInnerNode<TKey, TValue>) nodePtr.getChild(index);
+						nodePtr = ((BPTreeInnerNode<TKey, TValue>)nodePtr).getChild(index);
 						break;
 					}
 				}
@@ -70,21 +68,21 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 				//check last child reference 
 				if(index+1 == nodePtr.getKeyCount()){
 					index++;
-					if(nodePtr.getChild(index).isLeaf()){
+					if(((BPTreeInnerNode<TKey, TValue>)nodePtr).getChild(index).isLeaf()){
 						insertPosition = index;
-						isLeaf = true;
+						nodePtr = ((BPTreeInnerNode<TKey, TValue>)nodePtr).getChild(index);
 						break;
 					}
 					//else if the child is an inner nodes then move down to child node and run again
 					else{
-						nodePtr = (BPTreeInnerNode<TKey, TValue>) nodePtr.getChild(index);
+						nodePtr = ((BPTreeInnerNode<TKey, TValue>)nodePtr).getChild(index);
 						break;
 					}
 				}
 			}
 		}
 
-		BPTreeLeafNode<TKey, TValue> leafToInsertInto = (BPTreeLeafNode<TKey, TValue>)nodePtr.getChild(insertPosition);
+		BPTreeLeafNode<TKey, TValue> leafToInsertInto = (BPTreeLeafNode<TKey, TValue>)nodePtr;
 		return insertIntoNode(leafToInsertInto, key, value);
 	}
 
@@ -93,162 +91,154 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 	 */
 	public BPTreeNode<TKey, TValue> delete(TKey key){
 		//search tree for key
-		BPTreeLeafNode<TKey, TValue> deleteNode = (BPTreeLeafNode<TKey, TValue>)searchNode(key);
+		for(int index = 0; index < this.getKeyCount(); index++){
+			if(getKey(index).compareTo(key) > 0){
+				getChild(index).delete(key);
+				break;
+			}
+			else if(getKey(index).equals(key)){
+				getChild(index+1).delete(key);
+				break;
+			}
 
-		//if key was not found in tree then it can't be deleted
-		if(deleteNode == null){
-			return this;
+			if(index+1 == this.getKeyCount()){
+				getChild(index+1).delete(key);
+				break;
+			}
 		}
 
-		//delete the key
-		deleteNode.delete(key);
-
-		//Check of node underflows after delete
-		int minOrder = m/2-1 ;
-		if(deleteNode.getKeyCount() < minOrder){
-			return underflow(deleteNode, key);
-		}
-		else{
-			return this;
-		}
-	}
-
-	//=============================Helper Functions================================//
-	
-	protected BPTreeNode<TKey, TValue> underflow(BPTreeLeafNode<TKey, TValue> deleteNode, TKey deleteKey){
-		//Variables needed
-		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
-		int siblingKeyCount = 0;
 		int minOrder = m/2-1;
-		int keyCount = deleteNode.getKeyCount();
 
-		//See if left sibling has enough keys to share
-		BPTreeLeafNode<TKey, TValue> leftSibling = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
-		if(leftSibling != null){
-			//If left sibling exists check if it has enough keys to share
-			siblingKeyCount= leftSibling.getKeyCount();
-
-			//if it has enough
-			if(siblingKeyCount > minOrder){
-				System.out.println("Share Left");
-				//Move all keys one index up
-				for(int index = keyCount; index > 0; index--){
-					deleteNode.moveKey(deleteNode.getKey(index-1), deleteNode.getValue(index-1), index);
-				}
-
-				//Copy key from left sibling
-				deleteNode.insertKey(leftSibling.getKey(siblingKeyCount-1), leftSibling.getValue(siblingKeyCount-1), 0);
-
-				//Replace parent key if key deleted was saved in parent
-				for(int parentIndex = 0; parentIndex < parentNode.getKeyCount(); parentIndex++){
-					if(parentNode.getKey(parentIndex).equals(deleteKey)){
-						parentNode.setKey(parentIndex, deleteNode.getKey(0));
-						break;
-					}
-				}
-
-				//Remove key reference from sibling
-				leftSibling.keyTally--;
-				return this;
+		if(this.getKeyCount() < minOrder){
+			if(this.parentNode == null){
+				return this.getChild(0);
 			}
-			
-		}
-
-		//If not see if right sibling has enough keys to share
-		BPTreeLeafNode<TKey, TValue> rightSibling = (BPTreeLeafNode<TKey, TValue>)deleteNode.rightSibling;
-		if(rightSibling != null){
-			//If right sibling exists check if it has enough keys to share
-			siblingKeyCount = rightSibling.getKeyCount();
-
-			//if it has enough
-			if(siblingKeyCount > minOrder){
-				System.out.println("Share Right");
-				deleteNode.printKeys();
-				//Copy first key from right sibling
-				deleteNode.insertKey(rightSibling.getKey(0), rightSibling.getValue(0), keyCount);
-
-
-				//Move all keys and value down one index to fill gap
-				for(int moveIndex = 0; moveIndex <= keyCount; moveIndex++){
-					rightSibling.moveKey(rightSibling.getKey(moveIndex+1), rightSibling.getValue(moveIndex+1), moveIndex);
-				}
-				rightSibling.keyTally--;
-
-				//Replace parent key if key deleted was saved in parent
-				for(int parentIndex = 0; parentIndex <= parentNode.getKeyCount(); parentIndex++){
-					if(parentNode.getKey(parentIndex).equals(deleteKey)){
-						parentNode.setKey(parentIndex+1, rightSibling.getKey(0));
-						break;
-					}
-				}
-
-				return this;
+			else{
+				underflow(key);
 			}
-		}
-
-		if(leftSibling != null){
-			mergeLeft(deleteNode, deleteKey);
-		}
-		else if(rightSibling != null){
-			mergeRight(deleteNode, deleteKey);
 		}
 
 		return this;
 	}
 
-	protected BPTreeNode<TKey, TValue> mergeLeft(BPTreeLeafNode<TKey, TValue> deleteNode, TKey deleteKey){
-		System.out.println("Merge Left");
-		BPTreeLeafNode<TKey, TValue> leftNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.leftSibling;
-		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
-		
-		int keyCount = deleteNode.getKeyCount();
-		for(int index = 0; index < keyCount; index++){
-			leftNode.insertKey(deleteNode.getKey(index), deleteNode.getValue(index), leftNode.getKeyCount());
-		}
-		
-		int parentKeyCount = parentNode.getKeyCount();
-		for(int parentIndex = 0; parentIndex < parentKeyCount; parentIndex++){
-			if(parentNode.getKey(parentIndex).equals(deleteKey)){
-				for(int i = parentIndex; i < parentKeyCount; i++){
-					parentNode.setKey(i, parentNode.getKey(i+1));
-					parentNode.setChild(i, parentNode.getChild(i+1));
+	//=============================Helper Functions================================//
+	
+	protected BPTreeNode<TKey, TValue> underflow(TKey deleteKey){
+		//Variables needed
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)this.parentNode;
+		int siblingKeyCount = 0;
+		int minOrder = m/2-1;
+		int parentPostion = parentNode.getPosition(this);
+		int keyCount = this.getKeyCount();
+
+		BPTreeInnerNode<TKey, TValue> leftSibling = null;
+		//See if left sibling has enough keys to share
+		if(parentPostion > 0){
+			leftSibling = (BPTreeInnerNode<TKey, TValue>)parentNode.getChild(parentPostion-1);
+			siblingKeyCount= leftSibling.getKeyCount();
+			if(siblingKeyCount > minOrder){
+				//Move all keys one index up
+				for(int index = keyCount; index > 0; index--){
+					this.setKey(index, this.getKey(index-1));
+					this.setChild(index, this.getChild(index-1));
 				}
-				parentNode.keyTally--;
-				break;
+				this.keyTally++;
+
+				this.setKey(0, leftSibling.getKey(siblingKeyCount));
+				leftSibling.keyTally--;
+				parentNode.setKey(parentPostion, this.getKey(0));
+
+				// //Replace parent key if key deleted was saved in parent
+				// for(int parentIndex = 0; parentIndex < parentNode.getKeyCount(); parentIndex++){
+				// 	if(parentNode.getKey(parentIndex).equals(deleteKey)){
+				// 		parentNode.setKey(parentIndex, this.getKey(0));
+				// 		break;
+				// 	}
+				// }
+
+				//Remove key reference from sibling
+				
+				return this;
+			}
+			
+		}
+
+		BPTreeInnerNode<TKey, TValue> rightSibling = null;
+		if(parentPostion < parentNode.getKeyCount()){
+			rightSibling = (BPTreeInnerNode<TKey, TValue>)parentNode.getChild(parentPostion+1);
+			siblingKeyCount= rightSibling.getKeyCount();
+
+			if(siblingKeyCount > minOrder){
+				//Copy first key from right sibling
+				this.setKey(this.getKeyCount(), rightSibling.getKey(0));
+				this.setChild(this.getKeyCount(), rightSibling.getChild(0));
+				this.keyTally++;
+
+				//Move all keys and value down one index to fill gap
+				for(int moveIndex = 0; moveIndex < keyCount; moveIndex++){
+					rightSibling.setChild(moveIndex, rightSibling.getChild(moveIndex+1));
+					rightSibling.setKey(moveIndex, rightSibling.getKey(moveIndex+1));
+				}
+				rightSibling.keyTally--;
+
+				// //Replace parent key if key deleted was saved in parent
+				// for(int parentIndex = 0; parentIndex < parentNode.getKeyCount(); parentIndex++){
+				// 	if(parentNode.getKey(parentIndex).equals(deleteKey)){
+				// 		parentNode.setKey(parentIndex+1, rightSibling.getKey(0));
+				// 		break;
+				// 	}
+				// }
+
+				parentNode.setKey(parentPostion, rightSibling.getKey(0));
+				return this;
 			}
 		}
 
-		return parentNode;
+		if(leftSibling != null){
+			mergeLeft(deleteKey);
+		}
+		else{
+			mergeRight(deleteKey);
+		}
+
+		return this;
 	}
 
-	protected BPTreeNode<TKey, TValue> mergeRight(BPTreeLeafNode<TKey, TValue> deleteNode, TKey deleteKey){
-		System.out.println("Merge Right");
-		BPTreeLeafNode<TKey, TValue> rightNode = (BPTreeLeafNode<TKey, TValue>)deleteNode.rightSibling;
-		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)deleteNode.parentNode;
-		
-		//Move all value to make space
-		int keyCount = deleteNode.getKeyCount();
-		for(int index = 0; index < keyCount; index++){
-			rightNode.moveKey(rightNode.getKey(index), rightNode.getValue(index), keyCount+index);
+	protected BPTreeNode<TKey, TValue> mergeLeft( TKey deleteKey){
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)this.parentNode;
+		int parentPostion = parentNode.getPosition(this);
+		BPTreeInnerNode<TKey, TValue> leftSibling = (BPTreeInnerNode<TKey, TValue>)parentNode.getChild(parentPostion-1);
+		leftSibling.merge(this);
+		return leftSibling;
+	}
+
+	protected BPTreeNode<TKey, TValue> mergeRight( TKey deleteKey){
+		BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)this.parentNode;
+		int parentPostion = parentNode.getPosition(this);
+		BPTreeInnerNode<TKey, TValue> rightSibling = (BPTreeInnerNode<TKey, TValue>)parentNode.getChild(parentPostion+1);
+		this.merge(rightSibling);		
+		return this;
+	}
+
+	protected void merge(BPTreeInnerNode<TKey, TValue> consumeNode){
+		for (int index = 0; index < consumeNode.getKeyCount(); index++) {
+			this.setKey(this.getKeyCount(), consumeNode.getKey(0));
+			this.setChild(this.getKeyCount(), consumeNode.getChild(0));
+			this.keyTally++;
+		}
+	}
+
+	public void deleteIndex(int keyIndex, int child){
+
+		for(int index = keyIndex; index < this.getKeyCount(); index++) {
+			keys[index] = keys[index + 1];
+			references[index + child] = references[index + child + 1];
 		}
 
-		for(int index = 0; index <keyCount; index++){
-			rightNode.insertKey(deleteNode.getKey(index), deleteNode.getValue(index), index);
+		if(child == 0){
+			references[this.getKeyCount() - 1] = references[this.getKeyCount()];
 		}
-		
-		int parentKeyCount = parentNode.getKeyCount();
-		for(int parentIndex = 0; parentIndex < parentKeyCount; parentIndex++){
-			if(parentNode.getKey(parentIndex).equals(deleteKey)){
-				for(int i = parentIndex; i < parentKeyCount; i++){
-					parentNode.setKey(i, parentNode.getKey(i+1));
-					parentNode.setChild(i, parentNode.getChild(i+1));
-				}
-				parentNode.keyTally--;
-				break;
-			}
-		}
-
-		return parentNode;
+		this.keyTally--;
 	}
 
 	/**
@@ -269,7 +259,7 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 				}
 
 				//move up all references to make space for new reference
-				for(int moveIndex = keyCount; moveIndex > index; moveIndex--){
+				for(int moveIndex = keyCount+1; moveIndex > index; moveIndex--){
 					this.setChild(moveIndex, this.getChild(moveIndex-1));
 				}
 
@@ -291,6 +281,24 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 		return 0;
 	}
 
+
+	/**
+	 * Called from child class.
+	 * Send key to add.
+	 * Send back index key was added to update references within child.
+	 */
+	public int getPosition(BPTreeNode<TKey, TValue> node){
+		int keyCount = this.getKeyCount();
+
+		for(int index = 0; index < keyCount+1; index++){
+			if(this.getChild(index) == node){
+				return index;
+			}
+		}
+
+		return 0;
+	}
+
 	/**
 	 * Called from insert when position was found where node should be inserted.
 	 * Specify leaf to be inserted into with key and value.
@@ -301,6 +309,7 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 
 		//if the leaf is returned then no split happened, can just return this
 		if(nodeRef == node){
+			
 			return this;
 		}
 		else{
@@ -308,9 +317,15 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 			if(nodeRef.getKeyCount() == m){
 				nodeRef = innerNodeSplit((BPTreeInnerNode<TKey, TValue>)nodeRef);
 			}
+
 			//loop until root and split nodes on the way up
 			while(nodeRef.getParent() != null){
-				nodeRef = nodeRef.getParent();
+				if(nodeRef.getKeyCount() == m){
+					nodeRef = innerNodeSplit((BPTreeInnerNode<TKey, TValue>)nodeRef);
+				}
+				else{
+					nodeRef = nodeRef.getParent();
+				}
 			}
 
 			//return after all splits have happened
@@ -331,19 +346,22 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 		//some variables that are used
 		int midKey = innerNode.getKeyCount()/2;
 		int parentInsertPosition = 0;
+		boolean parentInsert = false;
 
 		//If old inner node was root
 		if(innerNode.parentNode == null){
 			newParent.setKey(0, innerNode.getKey(midKey));
-			newParent.setChild(0, innerNode.getChild(midKey));
 			newParent.keyTally = 1;
 		}
 		//If old inner node had a parent node
 		else{
 			//get parent of node being split
 			BPTreeInnerNode<TKey, TValue> parentNode = (BPTreeInnerNode<TKey, TValue>)innerNode.parentNode;
+
 			//send middle key to parent node, parent will return the index that the key was inserted into
 			parentInsertPosition = parentNode.addChildKey(innerNode.getKey(midKey));
+			parentInsert = true;
+
 			//update newParent node to the parent of node being split
 			newParent = parentNode;
 		}
@@ -364,16 +382,15 @@ class BPTreeInnerNode<TKey extends Comparable<TKey>, TValue> extends BPTreeNode<
 			rightInner.keyTally++;
 		}
 		//updates last reference of old inner node references
-		leftInner.setChild(rightInner.getKeyCount(), innerNode.getChild(midKey));
+		rightInner.setChild(rightInner.getKeyCount(), innerNode.getChild(innerNode.getKeyCount()));
 
-		//specific cases where siblings need to be relinked
-		if(parentInsertPosition + 2 < innerNode.getKeyCount()){
-			newParent.getChild(parentInsertPosition + 2).leftSibling = rightInner;
-			rightInner.rightSibling = newParent.getChild(parentInsertPosition + 2);
+		if(parentInsert){
+			newParent.setChild(parentInsertPosition, leftInner);
+			newParent.setChild(parentInsertPosition+1, rightInner);
 		}
-		if(parentInsertPosition - 1 >= 0){
-			newParent.getChild(parentInsertPosition - 1).rightSibling = leftInner;
-			leftInner.leftSibling = newParent.getChild(parentInsertPosition - 1);
+		else{
+			newParent.setChild(0, leftInner);
+			newParent.setChild(1, rightInner);
 		}
 
 		if(newParent.getKeyCount() == m){
