@@ -29,28 +29,26 @@ public class Main {
             graphDB.addFriendship(getUserId(tuple.t, graphDB), getUserId(tuple.u, graphDB), tuple.s);
         }
 
-        // Object[] result = sort(graphDB.minSpanningTree());
-        // for(Object relationship: result){
-        //     System.out.println((Relationship)relationship);
-        // }
-
-        //System.out.println(graphDB.getUser("A").getFriends());
+        Object[] result = sort(graphDB.minSpanningTree());
+        for(Object relationship: result){
+            System.out.println((Relationship)relationship);
+        }
 
         User[][] res = graphDB.clusterUsers();
-        // for(int i=0; i < res.length; i++){
-        //     String temp = "";
-        //     for(int j=0; j < res[i].length; j++){
-        //         temp += res[i][j].toString() + ";";
-        //     }
-        //     System.out.println(temp);
-        // }
+        for(int i=0; i < res.length; i++){
+            String temp = "";
+            for(int j=0; j < res[i].length; j++){
+                temp += res[i][j].toString() + ";";
+            }
+            System.out.println(temp);
+        }
 
         // Object[] userArr = sort(graphDB.getUsersAtDistance(graphDB.getUser("A"), 2));
         // for(Object user: userArr){
         //     System.out.println((User)user);
         // }
 
-        //coloring();
+        coloring();
     }
 
     public static int getUserId(String userName, GraphDB graphDB){

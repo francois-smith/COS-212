@@ -6,9 +6,14 @@ public class User {
     ArrayList<Relationship> friends = new ArrayList<>();
 
     //Custom Variables
+    //---- Colouring ----
     int saturationDegree = 0;
     int uncoloredDegree = 0;
     int colour = 0;
+
+    //---- Druskall ----
+    User parent = this;
+    int rank = 0;
 
     @Override
     public String toString() {
