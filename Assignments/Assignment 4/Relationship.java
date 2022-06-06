@@ -29,4 +29,20 @@ public class Relationship {
             return true;
         return false;
     }
+
+    //=================Helper Functions=====================//
+
+    /**
+     * Funtion that takes in a user that is part of this relationship and gets the other friend that forms part of this relationship.
+     * @param user
+     * @return User
+     */
+    public User getFriend(User user){
+        if(user.equals(friendA)){
+            return friendB;
+        }
+        else{
+            return friendA;
+        }
+    }
 }
