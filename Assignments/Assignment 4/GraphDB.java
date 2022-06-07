@@ -157,7 +157,33 @@ public class GraphDB {
     }
 
     public User[] getUsersAtDistance(User fromUser, int distance){
-        return null;
+        if(fromUser == null) return null;
+
+        ArrayList<User> userList = new ArrayList<User>();
+        for(int index = 0; index < users.size(); ++index){
+            if(!users.get(index).equals(fromUser)){
+                userList.add(users.get(index));
+            }
+        }
+
+        ArrayList<User> correctDistanceList = new ArrayList<User>();
+
+        while(!userList.isEmpty()){
+            User target = userList.get(0);
+            userList.remove(0);
+
+            int distanceToTarget = distanceBFS(users, fromUser, target);
+            if(distanceToTarget == distance){
+                correctDistanceList.add(target);
+            }
+        }
+
+        User[] returnArray = new User[correctDistanceList.size()];
+        for(int index = 0; index < correctDistanceList.size(); ++index){
+            returnArray[index] = correctDistanceList.get(index);
+        }
+
+        return returnArray;
     }
 
     //========================Helper Functions==============================//
@@ -168,11 +194,61 @@ public class GraphDB {
      * @param user (User To Find Subset Of)
      * @return Index
      */
-    User find(ArrayList<User> userList, User user){
+    private User find(ArrayList<User> userList, User user){
         if(userList.get(userList.indexOf(user)).parent != user){
             userList.get(userList.indexOf(user)).parent = find(userList, userList.get(userList.indexOf(user)).parent);
         }
         return userList.get(userList.indexOf(user)).parent;
+    }
+
+    /**
+     * Finds min number of vertices between a passed in root and a destination vertice.
+     * @param edges
+     * @param root
+     * @param destination
+     * @param size
+     * @return Integer representing number of nodes
+     */
+    private int distanceBFS(ArrayList<User> users, User root, User destination){
+        ArrayList<Boolean> visited = new ArrayList<>();
+        for (int i = 0; i < users.size(); i++){
+            visited.add(false);
+        }
+      
+        ArrayList<Integer> distances = new ArrayList<Integer>();
+        for (int i = 0; i < users.size(); i++){
+            distances.add(0);
+        }
+      
+        ArrayList<User> queue = new ArrayList<>();
+        distances.set(users.indexOf(root), 0);
+      
+        queue.add(root);
+        visited.set(users.indexOf(root), true);
+        
+        while (!queue.isEmpty()){
+            User current = queue.get(0);
+            queue.remove(0);
+
+            //Get All Neigbours Of The Selected User
+            ArrayList<User> neighbours = new ArrayList<>(); 
+            for(Relationship relationship: current.friends){
+                neighbours.add(relationship.getFriend(current));
+            }
+
+           // System.out.println("Current Node "+current+" with neighbours: "+neighbours);
+    
+            for (int index = 0; index < neighbours.size(); index++){
+                if(visited.get(users.indexOf(neighbours.get(index)))){
+                    continue;
+                }
+                    
+                distances.set(users.indexOf(neighbours.get(index)), users.indexOf(current) + 1);
+                queue.add(neighbours.get(index));
+                visited.set(users.indexOf(neighbours.get(index)), true);
+            }
+        }
+        return distances.get(users.indexOf(destination));
     }
 
     /**
