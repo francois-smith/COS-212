@@ -48,9 +48,9 @@ public class GraphDB {
         User frientee = getUser(frienteeID);
         User friended = getUser(friendedID);
 
+
         //If Users Either One Of User Does Not Exist Then No Relationship Can Be Made
         if(frientee == null || friended == null) return null;
-
         //If Both Users Were Found, Try And Add Relationship
         else{
             Relationship returnRelationship = frientee.addFriend(friended, relationshipValue);
@@ -68,6 +68,7 @@ public class GraphDB {
             user.uncoloredDegree = user.friends.size();
             user.colour = -1;
         }
+        colours.clear();
 
         //Make a Copy Of All Vertices In Graph To Process
         ArrayList<User> unprocessed = new ArrayList<>();
@@ -89,7 +90,6 @@ public class GraphDB {
 
             //Look At All Neighbours And Find The Min Colour To Apply To The User
             int colour = getMinColour(neighbours);
-            //System.out.println(colour);
 
             for(User neighbour: neighbours){
                 updateValues(neighbour, colour);
@@ -113,6 +113,7 @@ public class GraphDB {
                     i++;
                 }
             }
+            usersQuickSort(returnArray[index], 0, colours.get(index)-1);
         }
         return returnArray;
     }
@@ -128,7 +129,7 @@ public class GraphDB {
             processTree[index] = edges.get(index);
         }
         //Sort Edges in Order
-        quickSort(processTree, 0,  edges.size()-1);
+        relationshipQuickSort(processTree, 0,  edges.size()-1);
         int numEdges = 0;
 
         //Create Copy Of All Users And Set Default Values
@@ -236,18 +237,23 @@ public class GraphDB {
                 neighbours.add(relationship.getFriend(current));
             }
 
-           // System.out.println("Current Node "+current+" with neighbours: "+neighbours);
-    
             for (int index = 0; index < neighbours.size(); index++){
                 if(visited.get(users.indexOf(neighbours.get(index)))){
+                    Integer newDistance = new Integer(distances.get(users.indexOf(current))).intValue()+1;
+                    if(newDistance < distances.get(users.indexOf(neighbours.get(index)))){
+                        distances.set(users.indexOf(neighbours.get(index)), newDistance);
+                    }
                     continue;
                 }
-                    
-                distances.set(users.indexOf(neighbours.get(index)), users.indexOf(current) + 1);
-                queue.add(neighbours.get(index));
-                visited.set(users.indexOf(neighbours.get(index)), true);
-            }
+                else{
+                    Integer newDistance = new Integer(distances.get(users.indexOf(current))).intValue()+1;
+                    distances.set(users.indexOf(neighbours.get(index)), newDistance);
+                    queue.add(neighbours.get(index));
+                    visited.set(users.indexOf(neighbours.get(index)), true);
+                } 
+            }   
         }
+
         return distances.get(users.indexOf(destination));
     }
 
@@ -374,7 +380,7 @@ public class GraphDB {
     * @param low ()
     * @param high ()
     */
-    private int partition(Relationship[] array, int start, int end){
+    private int relationshipPartition(Relationship[] array, int start, int end){
         double pivot = array[end].friendshipValue;
         int pos = start-1;
     
@@ -399,11 +405,50 @@ public class GraphDB {
      * @param start (Starting Index)
      * @param end (Ending Index)
      */
-    private void quickSort(Relationship[] array, int start, int end){
+    private void relationshipQuickSort(Relationship[] array, int start, int end){
         if(start < end){
-            int index = partition(array, start, end);
-            quickSort(array, start, index - 1);
-            quickSort(array, index + 1, end);
+            int index = relationshipPartition(array, start, end);
+            relationshipQuickSort(array, start, index - 1);
+            relationshipQuickSort(array, index + 1, end);
         }
+    }
+
+    /**
+     * Quicksort Helper Function
+     * @param array (Array To Be Sorted)
+     * @param start (Starting Index)
+     * @param end (Ending Index)
+     */
+    private void usersQuickSort(User[] array, int start, int end){
+        if(start < end){
+            int index = usersPartition(array, start, end);
+            usersQuickSort(array, start, index - 1);
+            usersQuickSort(array, index + 1, end);
+        }
+    }
+
+    /**
+    * This function takes last element as pivot, places the pivot element at its correct position in sorted array, and places all smaller (smaller than pivot) to left of pivot and all greater elements to right of pivot.
+    * @param arr ()
+    * @param low ()
+    * @param high ()
+    */
+    private int usersPartition(User[] array, int start, int end){
+        double pivot = array[end].userID;
+        int pos = start-1;
+    
+        for(int index = start; index <= end-1; index++){
+            if(array[index].userID < pivot){
+                pos++;
+                User temp = array[pos];
+                array[pos] = array[index];
+                array[index] = temp;
+            }
+        }
+
+        User temp = array[pos + 1];
+        array[pos + 1] = array[end];
+        array[end] = temp;
+        return (pos + 1);
     }
 }
